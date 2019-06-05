@@ -6,6 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int parse(char* input);
+struct Interpreter;
+
+int parse(struct Interpreter* vm, char* input);
 
 #endif

@@ -46,7 +46,10 @@ struct Token {
     char* string;
 };
 
+struct Interpreter;
+
 struct Lexer {
+    struct Interpreter* vm;
     char* index;
     int line;
     struct Token token;

@@ -2,6 +2,7 @@
 
 #include "parser.h"
 #include "lexer.h"
+#include "interpreter.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -82,8 +83,9 @@ struct Operator parseExpression(struct Lexer* lexer, int priority) {
     return op;
 }
 
-int parse(char* input) {
+int parse(struct Interpreter* vm, char* input) {
 	struct Lexer lexer = {};
+    lexer.vm = vm;
 	lexer.line = 1;
 	lexer.index = input;
 

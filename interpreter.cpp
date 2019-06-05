@@ -2,14 +2,10 @@
 
 #include "interpreter.h"
 #include "parser.h"
+#include "lexer.h"
 #include "file.h"
-#include "code.h"
+#include "object.h"
 
-struct Interpreter {
-    struct Object stack[128];
-    int stackPointer;
-    std::vector<struct Object> storage;
-};
 
 int interpreterExecute(struct Interpreter* vm) {
     int code[] = {
@@ -85,11 +81,12 @@ int interpreter(int argc, char** argv) {
         .stackPointer = 0
     };
 
-    storeNumber(&interpreter, 12);
-    storeNumber(&interpreter, 14);
-    interpreterExecute(&interpreter);
-    // char* read = readFile("scripts/test.lang");
-    // status = parse(read);
-    // free(read);
+    // storeNumber(&interpreter, 12);
+    // storeNumber(&interpreter, 14);
+    // interpreterExecute(&interpreter);
+
+    char* read = readFile("scripts/test.lang");
+    status = parse(&interpreter, read);
+    free(read);
     return status;
 }
