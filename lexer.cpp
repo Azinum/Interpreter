@@ -154,6 +154,10 @@ struct Token lexerNextToken(struct Lexer* lexer) {
     return token;
 }
 
+void lexerGetTokenValue(char* buffer, struct Token token) {
+    sprintf(buffer, "%.*s", token.length, token.string);
+}
+
 int lexerTokenEquals(struct Token token, char* toMatch) {
     char* index = toMatch;
     for (int i = 0; i < token.length; i++, index++) {

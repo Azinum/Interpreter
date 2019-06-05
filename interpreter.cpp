@@ -5,7 +5,7 @@
 #include "lexer.h"
 #include "file.h"
 #include "object.h"
-
+#include "code.h"
 
 int interpreterExecute(struct Interpreter* vm) {
     int code[] = {
@@ -64,29 +64,17 @@ int interpreterExecute(struct Interpreter* vm) {
     return 0;
 }
 
-void storeNumber(struct Interpreter* vm, double number) {
-    vm->storage.push_back(
-        (struct Object) {
-            .type = T_NUMBER,
-            {
-                .number = number
-            }
-        }
-    );
-}
-
 int interpreter(int argc, char** argv) {
     int status = 0;
-    struct Interpreter interpreter = {
-        .stackPointer = 0
-    };
+    struct Interpreter interpreter = {};
 
-    // storeNumber(&interpreter, 12);
-    // storeNumber(&interpreter, 14);
     // interpreterExecute(&interpreter);
 
     char* read = readFile("scripts/test.lang");
-    status = parse(&interpreter, read);
-    free(read);
+
+    if (read) {
+        status = parse(&interpreter, read);
+        free(read); 
+    }
     return status;
 }

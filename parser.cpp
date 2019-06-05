@@ -3,6 +3,7 @@
 #include "parser.h"
 #include "lexer.h"
 #include "interpreter.h"
+#include "code.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -45,7 +46,6 @@ void parseStatement(struct Lexer* lexer) {
 
 void parseSimpleExpression(struct Lexer* lexer) {
     struct Token token = lexer->token;
-    lexerPrintToken(token);
 
     switch (token.type) {
         case T_IDENTIFIER: {
@@ -54,6 +54,7 @@ void parseSimpleExpression(struct Lexer* lexer) {
             break;
 
         case T_NUMBER: {
+            codePushNumber(lexer->vm, token);
             lexerNextToken(lexer);
         }
             break;

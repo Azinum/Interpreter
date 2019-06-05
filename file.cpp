@@ -2,9 +2,6 @@
 
 #include "file.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-
 char* readFile(const char* path) {
    char* buffer = NULL;
    long buffer_size, read_size;
@@ -34,4 +31,11 @@ char* readFile(const char* path) {
 
    fclose(file);
    return buffer;
+}
+
+void writeOut(FILE* file, const char* format, ...) {
+  va_list args;
+  va_start(args, format);
+  vfprintf(file, format, args);
+  va_end(args);
 }
