@@ -78,7 +78,8 @@ struct Operator parseExpression(struct Lexer* lexer, int priority) {
         token = lexer->token;
         lexerNextToken(lexer);
         nextOp = parseExpression(lexer, op.right);
-        lexerPrintToken(token);
+        codeOperator(lexer->vm, token);
+        // lexerPrintToken(token);
         op = nextOp;
     }
     return op;

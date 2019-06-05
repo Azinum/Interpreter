@@ -67,6 +67,7 @@ int interpreterExecute(struct Interpreter* vm) {
 int interpreter(int argc, char** argv) {
     int status = 0;
     struct Interpreter interpreter = {};
+    interpreter.out = fopen("out.tmp", "w");
 
     // interpreterExecute(&interpreter);
 
@@ -74,7 +75,10 @@ int interpreter(int argc, char** argv) {
 
     if (read) {
         status = parse(&interpreter, read);
+
         free(read); 
     }
+    if (interpreter.out)
+        fclose(interpreter.out);
     return status;
 }

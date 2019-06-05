@@ -12,6 +12,7 @@ struct Interpreter {
     std::vector<struct Object> storage;
     struct Object stack[128];
     int stackPointer;
+    FILE* out;
 };
 
 int interpreter(int argc, char** argv);

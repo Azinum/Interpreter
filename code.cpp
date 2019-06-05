@@ -22,6 +22,7 @@ int storeNumber(struct Interpreter* vm, double number) {
     return pointer;
 }
 
+// TODO: Support any type
 void codePushNumber(struct Interpreter* vm, struct Token token) {
     if (!vm) return;
 
@@ -40,4 +41,17 @@ void codePushNumber(struct Interpreter* vm, struct Token token) {
     }
     vm->code.push_back(OP_PUSH);
     vm->code.push_back(object);
+
+    writeOut(vm->out, "%s, %i,\n", opCodeToString(OP_PUSH), object);
+}
+
+// Generate code for any arithmetic operator
+void codeOperator(struct Interpreter* vm, struct Token token) {
+    int opCode = toOpCode(token.type);
+    if (opCode == OP_UNKNOWN) {
+        printf("%s\n", "Invalid operator");
+        return;
+    }
+    vm->code.push_back(opCode);
+    writeOut(vm->out, "%s,\n", opCodeToString(opCode));
 }

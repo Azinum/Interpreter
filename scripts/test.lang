@@ -1,1 +1,15 @@
+/*
+
+Generated code should be like this:
+
+OP_PUSH, 0,
+OP_PUSH, 1,
+OP_MULT,
+OP_PUSH, 2,
+OP_MULT,
+OP_PUSH, 3,
+OP_MULT,
+
+*/
+
 1 * 2 * 3 * 4   // -> (((1 * 2) * 3) * 4)
