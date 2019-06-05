@@ -14,6 +14,7 @@ struct Interpreter {
     std::vector<struct Object> storage;
     struct Object stack[STACK_SIZE];
     int stackPointer;
+    int status;
     FILE* out;
 };
 

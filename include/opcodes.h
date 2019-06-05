@@ -11,10 +11,13 @@ enum OpCodes {
     OP_MULT,
     OP_DIV,
 
-    OP_PUSH,
     OP_POP,
+    OP_PUSH,
 
-    OP_CODES_COUNT
+
+
+    OP_EXIT,
+    OP_CODES_COUNT,
 };
 
 // For logging purposes (and possibly caching!)

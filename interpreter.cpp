@@ -8,49 +8,64 @@
 #include "code.h"
 #include "opcodes.h"
 
+#define VM_NEXT goto *(program[++ip])
+#define VM_SKIP(COUNT) (ip += COUNT)
+
+#define VM_CASE(CASE, BODY, ...) { \
+    CASE : { BODY } \
+    VM_NEXT; \
+}
+
+#define OP_ARITH(OP) \
+if (vm->stackPointer > 1) { \
+    struct Object left, right; \
+    left = vm->stack[vm->stackPointer - 2]; \
+    right = vm->stack[vm->stackPointer - 1]; \
+    if (OP_SAMETYPE(left, right, T_NUMBER)) { \
+        vm->stack[vm->stackPointer - 2].value.number = left.value.number OP right.value.number; \
+        vm->stackPointer--; \
+    } \
+} \
+
+#define OP_SAMETYPE(LEFT, RIGHT, TYPE) (LEFT.type == TYPE && RIGHT.type == TYPE)
+
 // printTop(1) is top of stack
 void printTop(struct Interpreter* vm, int offset) {
     if (vm->stackPointer - offset >= 0) {
-        printf("top: %g\n", vm->stack[vm->stackPointer - offset].value.number);
+        struct Object object = vm->stack[vm->stackPointer - offset];
+        if (object.type == T_NUMBER)
+            printf("%g\n", object.value.number);
     }
 }
 
 int interpreterExecute(struct Interpreter* vm) {
+    unsigned int ip = 0;
 
-    unsigned int ip = 0;    // Instruction pointer
-    for (; ip < vm->code.size(); ip++) {
-        switch (vm->code[ip]) {
+    void* instructions[] = {
+        NULL,
+        &&ADD,
+        &&SUB,
+        &&MULT,
+        &&DIV,
+
+        &&POP,
+        &&PUSH,
+
+        &&EXIT
+    };
+
+    std::vector<void*> program;
+    
+    for (int i = 0; i < vm->code.size(); i++) {
+        int instruction = vm->code[i];
+
+        program.push_back(instructions[instruction]);
+
+        switch (instruction) {
+            // 1 arg, skip 1 instruction
             case OP_PUSH: {
-                int pointer = vm->code[ip + 1];
-                struct Object obj;
-                if (pointer < vm->storage.size()) {
-                    obj = vm->storage[pointer];
-                    vm->stack[vm->stackPointer++] = obj;
-                }
-                ip++;
-            }
-                break;
-
-            case OP_ADD: {
-                // Top of stack:
-                // vm->stack[vm->stackPointer-1]
-                if (vm->stackPointer > 1) {
-
-                    vm->stack[vm->stackPointer-2].value.number = vm->stack[vm->stackPointer-2].value.number
-                    + vm->stack[vm->stackPointer-1].value.number;
-                    vm->stackPointer--;
-                    printf("%g\n", vm->stack[vm->stackPointer-1].value.number);
-                }
-            }
-                break;
-
-            case OP_MULT: {
-                if (vm->stackPointer > 1) {
-                    vm->stack[vm->stackPointer-2].value.number = vm->stack[vm->stackPointer-2].value.number
-                    * vm->stack[vm->stackPointer-1].value.number;
-                    vm->stackPointer--;
-                    printf("%g\n", vm->stack[vm->stackPointer-1].value.number);
-                }
+                program.push_back(instructions[instruction]);
+                i++;
             }
                 break;
 
@@ -59,23 +74,39 @@ int interpreterExecute(struct Interpreter* vm) {
         }
     }
 
-//     void* instructions[] = {
-//         &&ADD,
-//         &&SUB,
-//         &&EXIT
-//     };
+    program.push_back(instructions[OP_EXIT]);
 
-//     void** program;
+    goto *(program[0]);
 
-//     (void)program;
-//     (void)instructions;
+    VM_CASE(ADD, {
+        OP_ARITH(+);
+        puts("HERE");
+    });
+    VM_CASE(SUB, {
+        OP_ARITH(-); 
+    });
+    VM_CASE(MULT, {
+       OP_ARITH(*);
+    });
+    VM_CASE(DIV, {
+       OP_ARITH(/); 
+    });
+    VM_CASE(PUSH, {
+        int pointer = vm->code[ip + 1];
+        struct Object obj;
+        if (pointer < vm->storage.size()) {
+            obj = vm->storage[pointer];
+            vm->stack[vm->stackPointer++] = obj;
+        }
+        ip++;
+    });
+    VM_CASE(POP, {
 
-// ADD:
-//     puts("ADD");
-// SUB:
-//     puts("SUB");
-// EXIT:
-//     puts("EXIT");
+    });
+    VM_CASE(EXIT, {
+        printTop(vm, 1);
+        return vm->status;
+    });
     return 0;
 }
 
