@@ -20,7 +20,7 @@ enum OpCodes {
     OP_CODES_COUNT,
 };
 
-// For logging purposes (and possibly caching!)
+// For logging purposes
 static const char* opCodesStrings[] = {
     "OP_UNKNOWN",
 
@@ -29,8 +29,8 @@ static const char* opCodesStrings[] = {
     "OP_MULT",
     "OP_DIV",
 
-    "OP_PUSH",
     "OP_POP",
+    "OP_PUSH",
 };
 
 int toOpCode(int tokenType);

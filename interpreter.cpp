@@ -80,16 +80,15 @@ int interpreterExecute(struct Interpreter* vm) {
 
     VM_CASE(ADD, {
         OP_ARITH(+);
-        puts("HERE");
     });
     VM_CASE(SUB, {
-        OP_ARITH(-); 
+        OP_ARITH(-);
     });
     VM_CASE(MULT, {
        OP_ARITH(*);
     });
     VM_CASE(DIV, {
-       OP_ARITH(/); 
+       OP_ARITH(/);
     });
     VM_CASE(PUSH, {
         int pointer = vm->code[ip + 1];
@@ -101,7 +100,9 @@ int interpreterExecute(struct Interpreter* vm) {
         ip++;
     });
     VM_CASE(POP, {
-
+        if (vm->stackPointer > 0) {
+            vm->stackPointer--;
+        }
     });
     VM_CASE(EXIT, {
         printTop(vm, 1);

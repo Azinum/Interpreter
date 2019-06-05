@@ -78,33 +78,36 @@ struct Token lexerNextToken(struct Lexer* lexer) {
     char ch = lexer->index[0];
     lexer->index++;
     switch (ch) {
-        case '=': {
+        case '=':
             token.type = T_ASSIGN;
-        }
             break;
-        case ';': {
+        
+        case ';':
             token.type = T_SEMICOLON;
-        }
             break;
 
-        case '+': {
+        case '+':
             token.type = T_ADD;
-        }
             break;
 
-        case '-': {
+        case '-':
             token.type = T_SUB;
-        }
             break;
 
-        case '*': {
+        case '*':
             token.type = T_MULT;
-        }
             break;
 
-        case '/': {
+        case '/':
             token.type = T_DIV;
-        }
+            break;
+
+        case '(':
+            token.type = T_LEFTPAREN;
+            break;
+        
+        case ')':
+            token.type = T_RIGHTPAREN;
             break;
 
         case '"': {

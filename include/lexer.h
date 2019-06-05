@@ -16,6 +16,8 @@ enum TokenTypes {
 
     T_ASSIGN,
     T_SEMICOLON,
+    T_LEFTPAREN,    // '('
+    T_RIGHTPAREN,   // ')'
 
     T_STRING,
     T_IDENTIFIER,

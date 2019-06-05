@@ -9,6 +9,7 @@
 #include <stdio.h>
 
 struct Operator getOperator(struct Token token);
+bool tupleEnd(struct Lexer* lexer);
 
 void parseStatement(struct Lexer* lexer);
 void parseSimpleExpression(struct Lexer* lexer);
@@ -20,6 +21,15 @@ struct Operator getOperator(struct Token token) {
         op = priority[token.type];
     }
     return op;
+}
+
+bool tupleEnd(struct Lexer* lexer) {
+    int type = lexer->token.type;
+    if (type == T_EOF) {
+        printf("%s\n", "Missing ')' closing parenthesis");
+        return true;
+    }
+    return (type == T_RIGHTPAREN);
 }
 
 void parseStatement(struct Lexer* lexer) {
@@ -59,6 +69,14 @@ void parseSimpleExpression(struct Lexer* lexer) {
         }
             break;
 
+        case T_LEFTPAREN: {
+            lexerNextToken(lexer);
+            if (!tupleEnd(lexer)) {
+                parseExpression(lexer, 0);
+            }
+        }
+            break;
+
         default:
             break;
     }
@@ -79,7 +97,6 @@ struct Operator parseExpression(struct Lexer* lexer, int priority) {
         lexerNextToken(lexer);
         nextOp = parseExpression(lexer, op.right);
         codeOperator(lexer->vm, token);
-        // lexerPrintToken(token);
         op = nextOp;
     }
     return op;
