@@ -5,6 +5,7 @@
 #include <limits.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 bool isNumber(const char* string) {
     if (strlen(string) <= 0)

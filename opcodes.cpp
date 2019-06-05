@@ -5,6 +5,7 @@
 
 #include <stdlib.h>
 
+// Operator to operation code
 int toOpCode(int tokenType) {
     // TODO: Cleanup
     switch (tokenType) {

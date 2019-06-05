@@ -8,9 +8,11 @@
 #include "code.h"
 #include "opcodes.h"
 
+// printTop(1) is top of stack
 void printTop(struct Interpreter* vm, int offset) {
-    if (vm->stackPointer - offset >= 0)
+    if (vm->stackPointer - offset >= 0) {
         printf("top: %g\n", vm->stack[vm->stackPointer - offset].value.number);
+    }
 }
 
 int interpreterExecute(struct Interpreter* vm) {

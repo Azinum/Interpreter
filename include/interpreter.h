@@ -7,10 +7,12 @@
 
 #include <vector>
 
+#define STACK_SIZE 128
+
 struct Interpreter {
     std::vector<int> code;
     std::vector<struct Object> storage;
-    struct Object stack[128];
+    struct Object stack[STACK_SIZE];
     int stackPointer;
     FILE* out;
 };

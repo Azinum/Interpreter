@@ -33,7 +33,7 @@ void codePushNumber(struct Interpreter* vm, struct Token token) {
         return;
     }
 
-    int number = stringToNumber(buffer);
+    double number = stringToNumber(buffer);
     int object = storeNumber(vm, number);
     if (object < 0) {
         printf("%s\n", "Failed to store number");
