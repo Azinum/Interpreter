@@ -6,19 +6,15 @@
 #include "file.h"
 #include "object.h"
 #include "code.h"
+#include "opcodes.h"
 
 int interpreterExecute(struct Interpreter* vm) {
-    int code[] = {
-        T_PUSH, 0,
-        T_PUSH, 1,
-        T_ADD
-    };
 
     unsigned int ip = 0;    // Instruction pointer
-    for (; ip < array_size(code) - 1;) {
-        switch (code[ip++]) {
-            case T_PUSH: {
-                int pointer = code[ip];
+    for (; ip < vm->code.size() - 1; ip++) {
+        switch (vm->code[ip]) {
+            case OP_PUSH: {
+                int pointer = vm->code[ip + 1];
                 struct Object obj;
                 if (pointer < vm->storage.size()) {
                     obj = vm->storage[pointer];
@@ -27,12 +23,22 @@ int interpreterExecute(struct Interpreter* vm) {
             }
                 break;
 
-            case T_ADD: {
+            case OP_ADD: {
                 // Top of stack:
                 // vm->stack[vm->stackPointer-1]
                 if (vm->stackPointer > 1) {
                     vm->stack[vm->stackPointer-2].value.number = vm->stack[vm->stackPointer-2].value.number
                     + vm->stack[vm->stackPointer-1].value.number;
+                    vm->stackPointer--;
+                    printf("%g\n", vm->stack[vm->stackPointer-1].value.number);
+                }
+            }
+                break;
+
+            case OP_MULT: {
+                if (vm->stackPointer > 1) {
+                    vm->stack[vm->stackPointer-2].value.number = vm->stack[vm->stackPointer-2].value.number
+                    * vm->stack[vm->stackPointer-1].value.number;
                     vm->stackPointer--;
                     printf("%g\n", vm->stack[vm->stackPointer-1].value.number);
                 }
@@ -69,13 +75,11 @@ int interpreter(int argc, char** argv) {
     struct Interpreter interpreter = {};
     interpreter.out = fopen("out.tmp", "w");
 
-    // interpreterExecute(&interpreter);
-
     char* read = readFile("scripts/test.lang");
 
     if (read) {
         status = parse(&interpreter, read);
-
+        interpreterExecute(&interpreter);
         free(read); 
     }
     if (interpreter.out)
