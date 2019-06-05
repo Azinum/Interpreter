@@ -8,10 +8,15 @@
 #include "code.h"
 #include "opcodes.h"
 
+void printTop(struct Interpreter* vm, int offset) {
+    if (vm->stackPointer - offset >= 0)
+        printf("top: %g\n", vm->stack[vm->stackPointer - offset].value.number);
+}
+
 int interpreterExecute(struct Interpreter* vm) {
 
     unsigned int ip = 0;    // Instruction pointer
-    for (; ip < vm->code.size() - 1; ip++) {
+    for (; ip < vm->code.size(); ip++) {
         switch (vm->code[ip]) {
             case OP_PUSH: {
                 int pointer = vm->code[ip + 1];
@@ -20,6 +25,7 @@ int interpreterExecute(struct Interpreter* vm) {
                     obj = vm->storage[pointer];
                     vm->stack[vm->stackPointer++] = obj;
                 }
+                ip++;
             }
                 break;
 
@@ -27,6 +33,7 @@ int interpreterExecute(struct Interpreter* vm) {
                 // Top of stack:
                 // vm->stack[vm->stackPointer-1]
                 if (vm->stackPointer > 1) {
+
                     vm->stack[vm->stackPointer-2].value.number = vm->stack[vm->stackPointer-2].value.number
                     + vm->stack[vm->stackPointer-1].value.number;
                     vm->stackPointer--;

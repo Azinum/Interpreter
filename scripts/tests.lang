@@ -1,0 +1,3 @@
+// tests.lang -- testing language features
+
+assert((2 * 3 * 4 * 5) == 100);
