@@ -116,13 +116,25 @@ int interpreter(int argc, char** argv) {
     struct Interpreter interpreter = {};
     interpreter.out = fopen("out.tmp", "w");
 
-    char* read = readFile("scripts/test.lang");
+    // char* read = readFile("scripts/test.lang");
 
-    if (read) {
-        status = parse(&interpreter, read);
-        interpreterExecute(&interpreter);
-        free(read); 
+    // if (read) {
+    //     status = parse(&interpreter, read);
+    //     interpreterExecute(&interpreter);
+    //     free(read);
+    // }
+
+    char* input = NULL;
+    unsigned long size = 0;
+
+    while (true) {
+        printf("> ");
+        if (getline(&input, &size, stdin) > 0) {
+            status = parse(&interpreter, input);
+            interpreterExecute(&interpreter);
+        }
     }
+
     if (interpreter.out)
         fclose(interpreter.out);
     return status;
