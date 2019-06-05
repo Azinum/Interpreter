@@ -14,7 +14,7 @@ struct Operator parseExpression(struct Lexer* lexer, int priority);
 
 struct Operator getOperator(struct Token token) {
     struct Operator op = {0};
-    if (token.type >= T_PLUS && token.type < T_NOOP) {
+    if (token.type > T_UNKNOWN && token.type < T_NOOP) {
         op = priority[token.type];
     }
     return op;
@@ -36,7 +36,6 @@ void parseStatement(struct Lexer* lexer) {
 			break;
 
 		default: {
-            // (expr | unary op)
 			parseExpression(lexer, 0);
 		}
 			break;
@@ -54,17 +53,16 @@ void parseSimpleExpression(struct Lexer* lexer) {
             break;
 
         case T_NUMBER: {
-            
+            lexerNextToken(lexer);
         }
             break;
 
         default:
             break;
     }
-    lexerNextToken(lexer);
 }
 
-// (expr) op <expr> op
+// (expr) op (expr)
 struct Operator parseExpression(struct Lexer* lexer, int priority) {
 	// TODO: Add unary operators
 

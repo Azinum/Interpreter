@@ -88,12 +88,12 @@ struct Token lexerNextToken(struct Lexer* lexer) {
             break;
 
         case '+': {
-            token.type = T_PLUS;
+            token.type = T_ADD;
         }
             break;
 
         case '-': {
-            token.type = T_MINUS;
+            token.type = T_SUB;
         }
             break;
 

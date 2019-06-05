@@ -3,16 +3,13 @@
 #ifndef _LEXER_H
 #define _LEXER_H
 
-#include <vector>
-
 #define array_size(arr) ((sizeof(arr)) / (sizeof(arr[0])))
-
 
 enum TokenTypes {
     T_UNKNOWN = 0,
 
-    T_PLUS,
-    T_MINUS,
+    T_ADD,
+    T_SUB,
     T_MULT,
     T_DIV,
     T_NOOP,
@@ -24,10 +21,13 @@ enum TokenTypes {
     T_IDENTIFIER,
     T_NUMBER,
     T_VARIABLE, // let / var
+    T_OBJECT,   // { ... }
+
+    T_PUSH,
+    T_POP,
 
     T_EOF,
 };
-
 
 struct Operator {
     unsigned char left,
@@ -39,7 +39,6 @@ static const struct Operator priority[] = {
     {10, 10}, {10, 10},     // + -
     {11, 11}, {11, 11},     // * /
 };
-
 
 struct Token {
     int type;

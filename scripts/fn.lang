@@ -1,0 +1,14 @@
+
+
+func add(a, b) {
+    return a + b;
+    // push 0 push 1 add return
+}
+
+func add(&a, b) {
+    a = b;  // push2 0 push 0 assign
+}
+
+v = 12;
+add(v, 2);
+print(v);   // -> 14
