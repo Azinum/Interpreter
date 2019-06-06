@@ -31,17 +31,6 @@ enum TokenTypes {
     T_EOF,
 };
 
-struct Operator {
-    unsigned char left,
-        right;
-};
-
-static const struct Operator priority[] = {
-    {0, 0},
-    {10, 10}, {10, 10},     // + -
-    {11, 11}, {11, 11},     // * /
-};
-
 struct Token {
     int type;
     int length;
