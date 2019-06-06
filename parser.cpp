@@ -59,9 +59,13 @@ void parseSimpleExpression(struct Lexer* lexer) {
 
     switch (token.type) {
         case T_IDENTIFIER: {
-            // ...
-            codePushVariable(lexer->vm, token);
+            int location = codePushVariable(lexer->vm, token);
             lexerNextToken(lexer);
+            if (lexer->token.type == T_ASSIGN) {
+                lexerNextToken(lexer);
+                parseExpression(lexer, 0);
+                codeAssign(lexer->vm, location);
+            }
         }
             break;
 

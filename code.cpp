@@ -45,8 +45,8 @@ void codePushNumber(struct Interpreter* vm, struct Token token) {
     writeOut(vm->out, "%s, %i,\n", opCodeToString(OP_PUSH), object);
 }
 
-void codePushVariable(struct Interpreter* vm, struct Token token) {
-    if (!vm) return;
+int codePushVariable(struct Interpreter* vm, struct Token token) {
+    if (!vm) return -1;
     char buffer[128] = {0};
     lexerGetTokenValue(buffer, token);
 
@@ -58,6 +58,16 @@ void codePushVariable(struct Interpreter* vm, struct Token token) {
     
     vm->code.push_back(OP_PUSH_VAR);
     vm->code.push_back(location);
+    writeOut(vm->out, "%s, %i,\n", opCodeToString(OP_PUSH_VAR), location);
+    return location;
+}
+
+void codeAssign(struct Interpreter* vm, int location) {
+    if (!vm) return;
+
+    vm->code.push_back(OP_ASSIGN);
+    vm->code.push_back(location);
+    writeOut(vm->out, "%s, %i\n", opCodeToString(OP_ASSIGN), location);
 }
 
 // Generate code for any arithmetic operator

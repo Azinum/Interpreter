@@ -10,6 +10,7 @@ FLAGS= $(FILES) -o interpreter -O2 -Iinclude -Wall
 
 all: compile run
 
+run_test: compile run_test_file
 
 compile:
 	$(CC) $(FLAGS)

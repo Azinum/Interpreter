@@ -8,8 +8,8 @@
 #include "code.h"
 #include "opcodes.h"
 
-#define VM_NEXT goto *(program[++ip])
-#define VM_SKIP(COUNT) (ip += COUNT)
+#define VM_NEXT goto *(vm->program[++vm->ip])
+#define VM_SKIP(COUNT) (vm->ip += COUNT)
 
 #define VM_CASE(CASE, BODY, ...) { \
     CASE : { BODY } \
@@ -39,8 +39,6 @@ void printTop(struct Interpreter* vm, int offset) {
 }
 
 int interpreterExecute(struct Interpreter* vm) {
-    unsigned int ip = 0;
-
     void* instructions[] = {
         NULL,
         &&ADD,
@@ -51,23 +49,23 @@ int interpreterExecute(struct Interpreter* vm) {
         &&POP,
         &&PUSH,
         &&PUSH_VAR,
+        &&ASSIGN,
 
         &&EXIT
     };
-
-    std::vector<void*> program;
     
-    for (int i = 0; i < vm->code.size(); i++) {
-        int instruction = vm->code[i];
+    for (; vm->codeip < vm->code.size(); vm->codeip++) {
+        int instruction = vm->code[vm->codeip];
 
-        program.push_back(instructions[instruction]);
+        vm->program.push_back(instructions[instruction]);
 
         switch (instruction) {
             // 1 arg, skip 1 instruction
+            case OP_ASSIGN:
             case OP_PUSH_VAR:
             case OP_PUSH: {
-                program.push_back(instructions[instruction]);
-                i++;
+                vm->program.push_back(instructions[instruction]);
+                vm->codeip++;
             }
                 break;
 
@@ -76,9 +74,9 @@ int interpreterExecute(struct Interpreter* vm) {
         }
     }
 
-    program.push_back(instructions[OP_EXIT]);
+    vm->program.push_back(instructions[OP_EXIT]);
 
-    goto *(program[0]);
+    goto *(vm->program[vm->ip]);
 
     VM_CASE(ADD, {
         OP_ARITH(+);
@@ -93,32 +91,44 @@ int interpreterExecute(struct Interpreter* vm) {
        OP_ARITH(/);
     });
     VM_CASE(PUSH, {
-        int pointer = vm->code[ip + 1];
+        int pointer = vm->code[vm->ip + 1];
         struct Object obj;
         if (pointer < vm->storage.size()) {
             obj = vm->storage[pointer];
             vm->stack[vm->stackPointer++] = obj;
         }
-        ip++;
+        vm->ip++;
     });
     VM_CASE(PUSH_VAR, {
-        int pointer = vm->code[ip + 1];
+        int pointer = vm->code[vm->ip + 1];
         struct Object obj;
         if (pointer < vm->current->variables.size() && pointer != -1) {
             obj = vm->current->variables[pointer];
             vm->stack[vm->stackPointer++] = obj;
         }
-        ip++;
+        vm->ip++;
+    });
+    VM_CASE(ASSIGN, {
+        int location;
+        struct Object right;
+        location = vm->code[vm->ip + 1];
+        right = vm->stack[vm->stackPointer - 1];
+        if (right.type == T_NUMBER) {
+            vm->current->variables[location] = right;
+            vm->stackPointer--;
+        }
+        vm->ip++;
     });
     VM_CASE(POP, {
         if (vm->stackPointer > 0) {
             vm->stackPointer--;
         }
     });
-    VM_CASE(EXIT, {
+    EXIT: {
         printTop(vm, 1);
+        vm->program.pop_back();
         return vm->status;
-    });
+    }
     return 0;
 }
 
