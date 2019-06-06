@@ -22,7 +22,7 @@ enum TokenTypes {
     T_STRING,
     T_IDENTIFIER,
     T_NUMBER,
-    T_VARIABLE,
+    T_EMPTYVAR,
     T_SCOPE,   // { ... }
 
     T_PUSH,

@@ -135,7 +135,7 @@ int storeVariable(struct Interpreter* vm, const char* name, struct Object object
 
 // Store empty variable
 int storeVariable2(struct Interpreter* vm, const char* name) {
-    struct Object object = { .type = T_VARIABLE };
+    struct Object object = { .type = T_EMPTYVAR };
     int location = storeVariable(vm, name, object);
     return location;
 }
@@ -151,7 +151,6 @@ int getVariableLocation(struct Interpreter* vm, const char* name) {
 }
 
 bool variableExists(struct Interpreter* vm, const char* name) {
-
     return vm->current->varLocations.count(name) != 0;
 }
 
@@ -162,11 +161,9 @@ int interpreter(int argc, char** argv) {
     interpreter.current = &interpreter.global;
     interpreter.current->parent = NULL;
 
-    int location = storeVariable(&interpreter, "a", (struct Object) {
+    storeVariable(&interpreter, "a", (struct Object) {
         .type = T_NUMBER,
-        .value = {
-            .number = 15
-        }
+        .value = { .number = 15 }
     });
 
     if (argc >= 2) {    // Execute file
