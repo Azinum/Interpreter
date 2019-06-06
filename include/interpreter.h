@@ -24,6 +24,8 @@ int storeVariable(struct Interpreter* vm, const char* name, struct Object object
 
 int storeVariable2(struct Interpreter* vm, const char* name);
 
+int getVariableLocation(struct Interpreter* vm, const char* name);
+
 bool variableExists(struct Interpreter* vm, const char* name);
 
 int interpreter(int argc, char** argv);

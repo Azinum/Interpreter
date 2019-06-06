@@ -104,10 +104,9 @@ int interpreterExecute(struct Interpreter* vm) {
     VM_CASE(PUSH_VAR, {
         int pointer = vm->code[ip + 1];
         struct Object obj;
-        if (pointer < vm->current->variables.size()) {
+        if (pointer < vm->current->variables.size() && pointer != -1) {
             obj = vm->current->variables[pointer];
             vm->stack[vm->stackPointer++] = obj;
-            printf("%g\n", obj.value.number);
         }
         ip++;
     });
@@ -128,9 +127,10 @@ int storeVariable(struct Interpreter* vm, const char* name, struct Object object
     if (variableExists(vm, name)) {
         return -1;
     }
-    vm->current->varLocations[name] = vm->current->variables.size();
+    int location = vm->current->variables.size();
+    vm->current->varLocations[name] = location;
     vm->current->variables.push_back(object);
-    return 0;
+    return location;
 }
 
 // Store empty variable
@@ -140,7 +140,18 @@ int storeVariable2(struct Interpreter* vm, const char* name) {
     return location;
 }
 
+int getVariableLocation(struct Interpreter* vm, const char* name) {
+    if (!vm) return -1;
+    if (!variableExists(vm, name)) {
+        printf("Variable '%s' doesn't exist\n", name);
+        return -1;
+    }
+    int location = vm->current->varLocations[name];
+    return location;
+}
+
 bool variableExists(struct Interpreter* vm, const char* name) {
+
     return vm->current->varLocations.count(name) != 0;
 }
 
@@ -151,15 +162,12 @@ int interpreter(int argc, char** argv) {
     interpreter.current = &interpreter.global;
     interpreter.current->parent = NULL;
 
-    int res = storeVariable(&interpreter, "a", (struct Object) {
+    int location = storeVariable(&interpreter, "a", (struct Object) {
         .type = T_NUMBER,
         .value = {
-            .number = 17
+            .number = 15
         }
     });
-    if (res == -1) {
-        printf("%s\n", "Failed to store variable, because it already exists!");
-    }
 
     if (argc >= 2) {    // Execute file
         char* read = readFile(argv[1]);

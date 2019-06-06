@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <map>
+#include <string>
 
 union ObjValue {
     double number;
@@ -19,7 +20,7 @@ struct Object {
 
 struct Scope {
     struct Scope* parent;
-    std::map<const char*, int> varLocations;
+    std::map<std::string, int> varLocations;
     std::vector<struct Object> variables;
 };
 

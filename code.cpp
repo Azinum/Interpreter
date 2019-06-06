@@ -50,11 +50,12 @@ void codePushVariable(struct Interpreter* vm, struct Token token) {
     char buffer[128] = {0};
     lexerGetTokenValue(buffer, token);
 
-    struct Object object = {};  // TEMP
-    int location = storeVariable(vm, buffer, object);
+    struct Object object = {};
+    int location = getVariableLocation(vm, buffer);
     if (location == -1) {
-        return;
+        location = storeVariable(vm, buffer, object);
     }
+    
     vm->code.push_back(OP_PUSH_VAR);
     vm->code.push_back(location);
 }
