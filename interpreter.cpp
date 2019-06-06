@@ -9,6 +9,7 @@
 #include "opcodes.h"
 
 #include <signal.h>
+#include <math.h>
 
 #define INPUT_MAX 128
 
@@ -35,14 +36,36 @@ if (vm->stackPointer > 1) { \
 
 static struct Interpreter* _interpreter;
 
+inline void stackPop(struct Interpreter* vm);
+
+inline void clearStack(struct Interpreter* vm);
+
+void printTop(struct Interpreter* vm, int offset);
 void exitInterpreter(int i);
+
+inline void stackPop(struct Interpreter* vm) {
+    if (vm->stackPointer > 0) {
+        vm->stackPointer--;
+    }
+}
+
+inline void clearStack(struct Interpreter* vm) {
+    vm->stackPointer = 0;
+}
 
 // printTop(1) is top of stack
 void printTop(struct Interpreter* vm, int offset) {
-    if (vm->stackPointer - offset >= 0) {
+    int index = vm->stackPointer - offset;
+    if (index >= 0 && index < STACK_SIZE) {
         struct Object object = vm->stack[vm->stackPointer - offset];
         if (object.type == T_NUMBER)
             printf("%g\n", object.value.number);
+    }
+}
+
+void exitInterpreter(int i) {
+    if (_interpreter) {
+        _interpreter->isRunning = false;
     }
 }
 
@@ -123,17 +146,18 @@ int interpreterExecute(struct Interpreter* vm) {
         right = vm->stack[vm->stackPointer - 1];
         if (right.type == T_NUMBER) {
             vm->current->variables[location] = right;
-            vm->stackPointer--;
+            printTop(vm, 1);
+            stackPop(vm);
         }
+        stackPop(vm);
         vm->ip++;
     });
     VM_CASE(POP, {
-        if (vm->stackPointer > 0) {
-            vm->stackPointer--;
-        }
+        stackPop(vm);
     });
     EXIT: {
         printTop(vm, 1);
+        stackPop(vm);
         vm->program.pop_back(); // Remove EXIT instruction
         return vm->status;
     }
@@ -182,9 +206,9 @@ int interpreter(int argc, char** argv) {
     interpreter.current->parent = NULL;
     signal(SIGINT, exitInterpreter);
 
-    storeVariable(&interpreter, "a", (struct Object) {
+    storeVariable(&interpreter, "pi", (struct Object) {
         .type = T_NUMBER,
-        .value = { .number = 15 }
+        .value = { .number = M_PI }
     });
 
     if (argc >= 2) {    // Execute file
@@ -196,7 +220,7 @@ int interpreter(int argc, char** argv) {
         }
     } else {
         char input[INPUT_MAX] = {0};
-        
+
         while (interpreter.isRunning) {
             printf("> ");
             if (fgets(input, INPUT_MAX, stdin) != NULL) {
@@ -207,12 +231,8 @@ int interpreter(int argc, char** argv) {
             }
         }
     }
+    writeOut(interpreter.out, "[stack size: %i]\n", interpreter.stackPointer);
+    writeOut(interpreter.out, "[program size: %i]\n", interpreter.program.size());
     if (interpreter.out) fclose(interpreter.out);
     return status;
-}
-
-void exitInterpreter(int i) {
-    if (_interpreter) {
-        _interpreter->isRunning = false;
-    }
 }
