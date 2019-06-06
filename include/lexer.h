@@ -22,8 +22,8 @@ enum TokenTypes {
     T_STRING,
     T_IDENTIFIER,
     T_NUMBER,
-    T_VARIABLE, // let / var
-    T_OBJECT,   // { ... }
+    T_VARIABLE,
+    T_SCOPE,   // { ... }
 
     T_PUSH,
     T_POP,
@@ -44,6 +44,7 @@ struct Lexer {
     char* index;
     int line;
     struct Token token;
+    int depth;  // parentheses 'depth', must be 0 when statement/expression ends
 };
 
 struct Token lexerNextToken(struct Lexer* lexer);

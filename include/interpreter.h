@@ -12,11 +12,19 @@
 struct Interpreter {
     std::vector<int> code;
     std::vector<struct Object> storage;
+    struct Scope global;
+    struct Scope* current;  // What scope are we in now?
     struct Object stack[STACK_SIZE];
     int stackPointer;
     int status;
     FILE* out;
 };
+
+int storeVariable(struct Interpreter* vm, const char* name, struct Object object);
+
+int storeVariable2(struct Interpreter* vm, const char* name);
+
+bool variableExists(struct Interpreter* vm, const char* name);
 
 int interpreter(int argc, char** argv);
 

@@ -15,4 +15,7 @@ compile:
 	$(CC) $(FLAGS)
 
 run:
-	./interpreter test.lang
+	./interpreter
+
+run_test_file:
+	./interpreter scripts/test.lang

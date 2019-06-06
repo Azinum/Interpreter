@@ -59,7 +59,9 @@ void parseSimpleExpression(struct Lexer* lexer) {
 
     switch (token.type) {
         case T_IDENTIFIER: {
-
+            // ...
+            codePushVariable(lexer->vm, token);
+            lexerNextToken(lexer);
         }
             break;
 

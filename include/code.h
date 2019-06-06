@@ -9,6 +9,8 @@ int storeNumber(struct Interpreter* vm, double number);
 
 void codePushNumber(struct Interpreter* vm, struct Token token);
 
+void codePushVariable(struct Interpreter* vm, struct Token token);
+
 void codeOperator(struct Interpreter* vm, struct Token token);
 
 #endif

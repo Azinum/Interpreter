@@ -50,6 +50,7 @@ int interpreterExecute(struct Interpreter* vm) {
 
         &&POP,
         &&PUSH,
+        &&PUSH_VAR,
 
         &&EXIT
     };
@@ -99,6 +100,9 @@ int interpreterExecute(struct Interpreter* vm) {
         }
         ip++;
     });
+    VM_CASE(PUSH_VAR, {
+
+    });
     VM_CASE(POP, {
         if (vm->stackPointer > 0) {
             vm->stackPointer--;
@@ -111,31 +115,64 @@ int interpreterExecute(struct Interpreter* vm) {
     return 0;
 }
 
+int storeVariable(struct Interpreter* vm, const char* name, struct Object object) {
+    if (!vm) return -1;
+    if (variableExists(vm, name)) {
+        return -1;
+    }
+    vm->current->varLocations[name] = vm->current->variables.size();
+    vm->current->variables.push_back(object);
+    return 0;
+}
+
+// Store empty variable
+int storeVariable2(struct Interpreter* vm, const char* name) {
+    struct Object object = { .type = T_VARIABLE };
+    int location = storeVariable(vm, name, object);
+    return location;
+}
+
+bool variableExists(struct Interpreter* vm, const char* name) {
+    return vm->current->varLocations.count(name) != 0;
+}
+
 int interpreter(int argc, char** argv) {
     int status = 0;
     struct Interpreter interpreter = {};
     interpreter.out = fopen("out.tmp", "w");
-    
-    // char* read = readFile("scripts/test.lang");
+    interpreter.current = &interpreter.global;
+    interpreter.current->parent = NULL;
 
-    // if (read) {
-    //     status = parse(&interpreter, read);
-    //     interpreterExecute(&interpreter);
-    //     free(read);
-    // }
+    int res = storeVariable(&interpreter, "a", (struct Object) {
+        .type = T_NUMBER,
+        .value = {
+            .number = 17
+        }
+    });
+    if (res == -1) {
+        printf("%s\n", "Failed to store variable, because it already exists!");
+    }
 
-    char* input = NULL;
-    unsigned long size = 0;
-
-    while (true) {
-        printf("> ");
-        if (getline(&input, &size, stdin) > 0) {
-            status = parse(&interpreter, input);
+    if (argc >= 2) {    // Execute file
+        char* read = readFile(argv[1]);
+        if (read) {
+            status = parse(&interpreter, read);
             interpreterExecute(&interpreter);
+            free(read);
+        }
+    } else {
+        char* input = NULL;
+        unsigned long size = 0;
+
+        while (true) {
+            printf("> ");
+            if (getline(&input, &size, stdin) > 0) {
+                status = parse(&interpreter, input);
+                interpreterExecute(&interpreter);
+            }
         }
     }
 
-    if (interpreter.out)
-        fclose(interpreter.out);
+    if (interpreter.out) fclose(interpreter.out);
     return status;
 }
