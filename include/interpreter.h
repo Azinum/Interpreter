@@ -20,6 +20,7 @@ struct Interpreter {
     struct Object stack[STACK_SIZE];
     int stackPointer;
     int status;
+    bool isRunning;
     FILE* out;
 };
 

@@ -8,6 +8,10 @@
 #include "code.h"
 #include "opcodes.h"
 
+#include <signal.h>
+
+#define INPUT_MAX 128
+
 #define VM_NEXT goto *(vm->program[++vm->ip])
 #define VM_SKIP(COUNT) (vm->ip += COUNT)
 
@@ -28,6 +32,10 @@ if (vm->stackPointer > 1) { \
 } \
 
 #define OP_SAMETYPE(LEFT, RIGHT, TYPE) (LEFT.type == TYPE && RIGHT.type == TYPE)
+
+static struct Interpreter* _interpreter;
+
+void exitInterpreter(int i);
 
 // printTop(1) is top of stack
 void printTop(struct Interpreter* vm, int offset) {
@@ -167,9 +175,12 @@ bool variableExists(struct Interpreter* vm, const char* name) {
 int interpreter(int argc, char** argv) {
     int status = 0;
     struct Interpreter interpreter = {};
+    _interpreter = &interpreter;
+    interpreter.isRunning = true;
     interpreter.out = fopen("out.tmp", "w");
     interpreter.current = &interpreter.global;
     interpreter.current->parent = NULL;
+    signal(SIGINT, exitInterpreter);
 
     storeVariable(&interpreter, "a", (struct Object) {
         .type = T_NUMBER,
@@ -184,18 +195,24 @@ int interpreter(int argc, char** argv) {
             free(read);
         }
     } else {
-        char* input = NULL;
-        unsigned long size = 0;
-
-        while (true) {
+        char input[INPUT_MAX] = {0};
+        
+        while (interpreter.isRunning) {
             printf("> ");
-            if (getline(&input, &size, stdin) > 0) {
+            if (fgets(input, INPUT_MAX, stdin) != NULL) {
                 status = parse(&interpreter, input);
-                interpreterExecute(&interpreter);
+                interpreterExecute(&interpreter);  
+            } else {
+                interpreter.isRunning = false;
             }
         }
     }
-
     if (interpreter.out) fclose(interpreter.out);
     return status;
+}
+
+void exitInterpreter(int i) {
+    if (_interpreter) {
+        _interpreter->isRunning = false;
+    }
 }
