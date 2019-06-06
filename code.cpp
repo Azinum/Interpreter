@@ -51,8 +51,10 @@ int codePushVariable(struct Interpreter* vm, struct Token token) {
     lexerGetTokenValue(buffer, token);
 
     struct Object object = {};
-    int location = getVariableLocation(vm, buffer);
-    if (location == -1) {
+    int location;
+    if (variableExists(vm, buffer)) {
+        location = getVariableLocation(vm, buffer);
+    } else {
         location = storeVariable(vm, buffer, object);
     }
     

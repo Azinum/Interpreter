@@ -11,13 +11,13 @@
 
 struct Interpreter {
     std::vector<int> code;
+    std::vector<void*> program;
+    unsigned int ip;
+    unsigned int codeip;
     std::vector<struct Object> storage;
     struct Scope global;
     struct Scope* current;  // What scope are we in now?
     struct Object stack[STACK_SIZE];
-    std::vector<void*> program;
-    unsigned int ip;
-    unsigned int codeip;
     int stackPointer;
     int status;
     FILE* out;

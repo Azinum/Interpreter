@@ -126,7 +126,7 @@ int interpreterExecute(struct Interpreter* vm) {
     });
     EXIT: {
         printTop(vm, 1);
-        vm->program.pop_back();
+        vm->program.pop_back(); // Remove EXIT instruction
         return vm->status;
     }
     return 0;
