@@ -64,6 +64,7 @@ int interpreterExecute(struct Interpreter* vm) {
 
         switch (instruction) {
             // 1 arg, skip 1 instruction
+            case OP_PUSH_VAR:
             case OP_PUSH: {
                 program.push_back(instructions[instruction]);
                 i++;
@@ -101,7 +102,14 @@ int interpreterExecute(struct Interpreter* vm) {
         ip++;
     });
     VM_CASE(PUSH_VAR, {
-
+        int pointer = vm->code[ip + 1];
+        struct Object obj;
+        if (pointer < vm->current->variables.size()) {
+            obj = vm->current->variables[pointer];
+            vm->stack[vm->stackPointer++] = obj;
+            printf("%g\n", obj.value.number);
+        }
+        ip++;
     });
     VM_CASE(POP, {
         if (vm->stackPointer > 0) {

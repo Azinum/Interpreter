@@ -55,9 +55,8 @@ void codePushVariable(struct Interpreter* vm, struct Token token) {
     if (location == -1) {
         return;
     }
-
-    printf("%i\n", location);
-
+    vm->code.push_back(OP_PUSH_VAR);
+    vm->code.push_back(location);
 }
 
 // Generate code for any arithmetic operator
