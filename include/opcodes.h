@@ -15,6 +15,7 @@ enum OpCodes {
     OP_EQ,
     OP_LEQ,
     OP_GEQ,
+    OP_NEQ,
 
     OP_POP,
     OP_PUSH,
@@ -39,6 +40,7 @@ static const char* opCodesStrings[] = {
     "OP_EQ",
     "OP_LEQ",
     "OP_GEQ",
+    "OP_NEQ",
 
     "OP_POP",
     "OP_PUSH",

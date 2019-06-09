@@ -17,6 +17,7 @@ enum TokenTypes {
     T_EQ,   // '=='
     T_LEQ,  // '<='
     T_GEQ,  // '>='
+    T_NEQ,  // '!='
     T_NOOP,
 
     T_ASSIGN,

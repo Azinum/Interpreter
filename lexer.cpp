@@ -94,7 +94,7 @@ struct Token lexerNextToken(struct Lexer* lexer) {
         case '/':
             token.type = T_DIV;
             break;
-            
+
         case '=':
             if (lexer->index[0] == '=') {
                 lexer->index++;
@@ -120,6 +120,14 @@ struct Token lexerNextToken(struct Lexer* lexer) {
                 break;
             }
             token.type = T_GT;
+            break;
+
+        case '!':
+            if (lexer->index[0] == '=') {
+                lexer->index++;
+                token.type = T_NEQ;
+                break;
+            }
             break;
 
         case '(':

@@ -18,6 +18,7 @@ int toOpCode(int tokenType) {
         case T_EQ: return OP_EQ;
         case T_LEQ: return OP_LEQ;
         case T_GEQ: return OP_GEQ;
+        case T_NEQ: return OP_NEQ;
         
         default: return OP_UNKNOWN;
     }

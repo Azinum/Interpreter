@@ -80,6 +80,7 @@ int interpreterExecute(struct Interpreter* vm) {
         &&EQ,
         &&LEQ,
         &&GEQ,
+        &&NEQ,
 
         &&POP,
         &&PUSH,
@@ -138,6 +139,9 @@ int interpreterExecute(struct Interpreter* vm) {
     });
     VM_CASE(GEQ, {
         OP_ARITH(>=);
+    });
+    VM_CASE(NEQ, {
+        OP_ARITH(!=);
     });
     VM_CASE(PUSH, {
         int pointer = vm->code[vm->ip + 1];
