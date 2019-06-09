@@ -12,6 +12,11 @@ enum TokenTypes {
     T_SUB,
     T_MULT,
     T_DIV,
+    T_LT,   // '<'
+    T_GT,   // '>'
+    T_EQ,   // '=='
+    T_LEQ,  // '<='
+    T_GEQ,  // '>='
     T_NOOP,
 
     T_ASSIGN,

@@ -75,10 +75,6 @@ struct Token lexerNextToken(struct Lexer* lexer) {
     lexer->index++;
     lexer->count++;
     switch (ch) {
-        case '=':
-            token.type = T_ASSIGN;
-            break;
-        
         case ';':
             token.type = T_SEMICOLON;
             break;
@@ -97,6 +93,33 @@ struct Token lexerNextToken(struct Lexer* lexer) {
 
         case '/':
             token.type = T_DIV;
+            break;
+            
+        case '=':
+            if (lexer->index[0] == '=') {
+                lexer->index++;
+                token.type = T_EQ;
+                break;
+            }
+            token.type = T_ASSIGN;
+            break;
+
+        case '<':
+            if (lexer->index[0] == '=') {
+                lexer->index++;
+                token.type = T_LEQ;
+                break;
+            }
+            token.type = T_LT;
+            break;
+        
+        case '>':
+            if (lexer->index[0] == '=') {
+                lexer->index++;
+                token.type = T_GEQ;
+                break;
+            }
+            token.type = T_GT;
             break;
 
         case '(':
@@ -128,8 +151,8 @@ struct Token lexerNextToken(struct Lexer* lexer) {
             if (lexer->index[0] == '"') {
                 lexer->index++;
             }
-        }
             break;
+        }
 
         default: {
             if (isAlphabetical(ch) || ch == '_') {

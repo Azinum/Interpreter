@@ -75,6 +75,11 @@ int interpreterExecute(struct Interpreter* vm) {
         &&SUB,
         &&MULT,
         &&DIV,
+        &&LT,
+        &&GT,
+        &&EQ,
+        &&LEQ,
+        &&GEQ,
 
         &&POP,
         &&PUSH,
@@ -93,10 +98,9 @@ int interpreterExecute(struct Interpreter* vm) {
             // 1 arg, skip 1 instruction
             case OP_ASSIGN:
             case OP_PUSH_VAR:
-            case OP_PUSH: {
+            case OP_PUSH:
                 vm->program.push_back(instructions[instruction]);
                 vm->codeip++;
-            }
                 break;
 
             default:
@@ -119,6 +123,21 @@ int interpreterExecute(struct Interpreter* vm) {
     });
     VM_CASE(DIV, {
        OP_ARITH(/);
+    });
+    VM_CASE(LT, {
+        OP_ARITH(<);
+    });
+    VM_CASE(GT, {
+        OP_ARITH(>);
+    });
+    VM_CASE(EQ, {
+        OP_ARITH(==);
+    });
+    VM_CASE(LEQ, {
+        OP_ARITH(<=);
+    });
+    VM_CASE(GEQ, {
+        OP_ARITH(>=);
     });
     VM_CASE(PUSH, {
         int pointer = vm->code[vm->ip + 1];
@@ -145,10 +164,7 @@ int interpreterExecute(struct Interpreter* vm) {
         toAssign = vm->stack[vm->stackPointer - 1];
         if (toAssign.type == T_NUMBER) {
             vm->current->variables[location] = toAssign;
-            // printTop(vm, 1);
-            // stackPop(vm);
         }
-        // stackPop(vm);
         vm->ip++;
     });
     VM_CASE(POP, {

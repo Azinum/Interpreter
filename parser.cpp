@@ -43,17 +43,13 @@ void parseStatement(struct Lexer* lexer) {
 	struct Token token = lexer->token;
 
 	switch (token.type) {
-        // case T_NEWLINE:
-        //     break;
-
         case T_SEMICOLON:
             lexerNextToken(lexer);
             break;
-
 		default: {
 			parseExpression(lexer, 0);
+            break;
 		}
-			break;
 	}
 }
 
@@ -72,15 +68,13 @@ void parseSimpleExpression(struct Lexer* lexer) {
                     codePop(lexer->vm);
                 }
             }
-        }
             break;
-
+        }
         case T_NUMBER: {
             codePushNumber(lexer->vm, token);
             lexerNextToken(lexer);
-        }
             break;
-
+        }
         case T_LEFTPAREN: {
             lexerNextToken(lexer);  // Skip '('
             if (!tupleEnd(lexer)) {
@@ -95,8 +89,8 @@ void parseSimpleExpression(struct Lexer* lexer) {
             } else {
                 error(lexer, "Missing closing ')' parenthesis", lexer->token);
             }
-        }
             break;
+        }
 
         default:
             break;
