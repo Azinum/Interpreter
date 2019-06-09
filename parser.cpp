@@ -8,12 +8,19 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+void error(struct Lexer* lexer, const char* message, struct Token token);
 struct Operator getOperator(struct Token token);
 bool tupleEnd(struct Lexer* lexer);
 
 void parseStatement(struct Lexer* lexer);
 void parseSimpleExpression(struct Lexer* lexer);
 struct Operator parseExpression(struct Lexer* lexer, int priority);
+
+void error(struct Lexer* lexer, const char* message, struct Token token) {
+    char buffer[128] = {0};
+    lexerGetTokenValue(buffer, token);
+    printf("[SyntaxError] %s near '%s' (line: %i)\n", message, buffer, lexer->line);
+}
 
 struct Operator getOperator(struct Token token) {
     struct Operator op = {0};
@@ -26,18 +33,18 @@ struct Operator getOperator(struct Token token) {
 bool tupleEnd(struct Lexer* lexer) {
     int type = lexer->token.type;
     if (type == T_EOF) {
-        printf("%s\n", "Missing ')' closing parenthesis");
+        error(lexer, "Missing closing ')' parenthesis", lexer->token);
         return true;
     }
     return (type == T_RIGHTPAREN);
 }
 
 void parseStatement(struct Lexer* lexer) {
-	struct Token token = lexerNextToken(lexer);
+	struct Token token = lexer->token;
 
 	switch (token.type) {
-        case T_NEWLINE:
-            break;
+        // case T_NEWLINE:
+        //     break;
 
         case T_SEMICOLON:
             lexerNextToken(lexer);
@@ -56,9 +63,9 @@ void parseSimpleExpression(struct Lexer* lexer) {
     switch (token.type) {
         case T_IDENTIFIER: {
             int location = codePushVariable(lexer->vm, token);
-            lexerNextToken(lexer);
+            lexerNextToken(lexer);  // Skip identifier
             if (lexer->token.type == T_ASSIGN) {
-                lexerNextToken(lexer);
+                lexerNextToken(lexer);  // Skip '='
                 parseExpression(lexer, 0);
                 codeAssign(lexer->vm, location);
             }
@@ -72,14 +79,18 @@ void parseSimpleExpression(struct Lexer* lexer) {
             break;
 
         case T_LEFTPAREN: {
-            lexerNextToken(lexer);
+            lexerNextToken(lexer);  // Skip '('
             if (!tupleEnd(lexer)) {
                 parseExpression(lexer, 0);
             }
             if (lexerExpectToken(lexer->token, T_RIGHTPAREN)) {
                 lexerNextToken(lexer);   // Skip ')'
+                
+                if (lexerTokenIs(lexer, T_LEFTPAREN)) {
+                    error(lexer, "", lexer->token);
+                }
             } else {
-                printf("%s\n", "Missing closing ')' parenthesis");
+                error(lexer, "Missing closing ')' parenthesis", lexer->token);
             }
         }
             break;
@@ -114,13 +125,7 @@ int parse(struct Interpreter* vm, char* input) {
     lexer.vm = vm;
 	lexer.line = 1;
 	lexer.index = input;
-
-	while (1) {
-		parseStatement(&lexer);
-		if (lexer.token.type == T_UNKNOWN ||
-			lexer.token.type == T_EOF) {
-			break;
-		}
-	}
+    lexerNextToken(&lexer);
+    parseStatement(&lexer);
 	return 0;
 }

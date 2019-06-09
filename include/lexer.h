@@ -56,6 +56,8 @@ int lexerTokenEquals(struct Lexer* lexer, char* toMatch);
 
 bool lexerExpectToken(struct Token token, int type);
 
+bool lexerTokenIs(struct Lexer* lexer, int type);
+
 void lexerPrintToken(struct Token token);
 
 #endif

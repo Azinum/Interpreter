@@ -110,6 +110,7 @@ struct Token lexerNextToken(struct Lexer* lexer) {
         case '\r':
         case '\n':
             token.type = T_NEWLINE;
+            lexer->line++;
             break;
 
         case '"': {
@@ -175,6 +176,10 @@ int lexerTokenEquals(struct Token token, char* toMatch) {
 
 bool lexerExpectToken(struct Token token, int type) {
     return token.type == type;
+}
+
+bool lexerTokenIs(struct Lexer* lexer, int type) {
+    return lexer->token.type == type;
 }
 
 void lexerPrintToken(struct Token token) {
