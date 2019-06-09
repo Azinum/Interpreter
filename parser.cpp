@@ -68,6 +68,9 @@ void parseSimpleExpression(struct Lexer* lexer) {
                 lexerNextToken(lexer);  // Skip '='
                 parseExpression(lexer, 0);
                 codeAssign(lexer->vm, location);
+                if (lexerTokenIs(lexer, T_SEMICOLON)) {
+                    codePop(lexer->vm);
+                }
             }
         }
             break;

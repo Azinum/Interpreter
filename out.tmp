@@ -1,2 +1,13 @@
-[stack size: 0]
-[program size: 0]
+OP_PUSH_VAR, 1,
+OP_PUSH, 0,
+OP_ASSIGN, 1
+OP_PUSH_VAR, 1,
+OP_PUSH_VAR, 1,
+OP_PUSH_VAR, 2,
+OP_PUSH, 1,
+OP_ASSIGN, 2
+OP_ASSIGN, 1
+OP_PUSH_VAR, 1,
+OP_PUSH_VAR, 2,
+[stack size: 2]
+[program size: 22]

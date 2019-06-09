@@ -65,10 +65,18 @@ int codePushVariable(struct Interpreter* vm, struct Token token) {
 
 void codeAssign(struct Interpreter* vm, int location) {
     if (!vm) return;
-
+    
     vm->code.push_back(OP_ASSIGN);
     vm->code.push_back(location);
     writeOut(vm->out, "%s, %i\n", opCodeToString(OP_ASSIGN), location);
+}
+
+// Add OP_POP instruction
+void codePop(struct Interpreter* vm) {
+    if (!vm) return;
+
+    vm->code.push_back(OP_POP);
+    writeOut(vm->out, "%s\n", opCodeToString(OP_POP));
 }
 
 // Generate code for any arithmetic operator

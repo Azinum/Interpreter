@@ -13,6 +13,8 @@ int codePushVariable(struct Interpreter* vm, struct Token token);
 
 void codeAssign(struct Interpreter* vm, int location);
 
+void codePop(struct Interpreter* vm);
+
 void codeOperator(struct Interpreter* vm, struct Token token);
 
 #endif

@@ -140,15 +140,15 @@ int interpreterExecute(struct Interpreter* vm) {
     });
     VM_CASE(ASSIGN, {
         int location;
-        struct Object right;
+        struct Object toAssign;
         location = vm->code[vm->ip + 1];
-        right = vm->stack[vm->stackPointer - 1];
-        if (right.type == T_NUMBER) {
-            vm->current->variables[location] = right;
-            printTop(vm, 1);
-            stackPop(vm);
+        toAssign = vm->stack[vm->stackPointer - 1];
+        if (toAssign.type == T_NUMBER) {
+            vm->current->variables[location] = toAssign;
+            // printTop(vm, 1);
+            // stackPop(vm);
         }
-        stackPop(vm);
+        // stackPop(vm);
         vm->ip++;
     });
     VM_CASE(POP, {
