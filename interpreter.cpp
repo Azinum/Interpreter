@@ -174,8 +174,7 @@ int storeVariable(struct Interpreter* vm, const char* name, struct Object object
     return location;
 }
 
-// Store empty variable
-int storeVariable2(struct Interpreter* vm, const char* name) {
+int storeEmptyVariable(struct Interpreter* vm, const char* name) {
     struct Object object = { .type = T_EMPTYVAR };
     int location = storeVariable(vm, name, object);
     return location;

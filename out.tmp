@@ -1,8 +1,2 @@
-OP_PUSH, 0,
-OP_PUSH, 1,
-OP_ADD,
-OP_PUSH, 2,
-OP_PUSH_VAR, 0,
-OP_MULT,
 [stack size: 0]
-[program size: 10]
+[program size: 0]

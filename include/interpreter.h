@@ -26,7 +26,7 @@ struct Interpreter {
 
 int storeVariable(struct Interpreter* vm, const char* name, struct Object object);
 
-int storeVariable2(struct Interpreter* vm, const char* name);
+int storeEmptyVariable(struct Interpreter* vm, const char* name);
 
 int getVariableLocation(struct Interpreter* vm, const char* name);
 

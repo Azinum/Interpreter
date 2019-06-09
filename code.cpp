@@ -54,7 +54,7 @@ int codePushVariable(struct Interpreter* vm, struct Token token) {
     if (variableExists(vm, buffer)) {
         location = getVariableLocation(vm, buffer);
     } else {
-        location = storeVariable2(vm, buffer);
+        location = storeEmptyVariable(vm, buffer);
     }
     
     vm->code.push_back(OP_PUSH_VAR);
