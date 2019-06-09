@@ -36,12 +36,11 @@ if (vm->stackPointer > 1) { \
 
 static struct Interpreter* _interpreter;
 
-inline void stackPop(struct Interpreter* vm);
-
-inline void clearStack(struct Interpreter* vm);
-
 void printTop(struct Interpreter* vm, int offset);
 void exitInterpreter(int i);
+
+inline void stackPop(struct Interpreter* vm);
+inline void clearStack(struct Interpreter* vm);
 
 inline void stackPop(struct Interpreter* vm) {
     if (vm->stackPointer > 0) {
@@ -203,7 +202,6 @@ int interpreter(int argc, char** argv) {
     interpreter.isRunning = true;
     interpreter.out = fopen("out.tmp", "w");
     interpreter.current = &interpreter.global;
-    interpreter.current->parent = NULL;
     signal(SIGINT, exitInterpreter);
 
     storeVariable(&interpreter, "pi", (struct Object) {

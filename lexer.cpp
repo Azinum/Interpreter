@@ -31,10 +31,6 @@ void removeWhiteSpaces(struct Lexer* lexer) {
         if (isWhiteSpace(lexer->index[0])) {
             lexer->index++;
         }
-        else if (isEndOfLine(lexer->index[0])) {
-            lexer->index++;
-            lexer->line++;
-        }
         else if (lexer->index[0] == '/' && lexer->index[1] == '/') {  // Comment
             lexer->index += 2;
             while (lexer->index[0] && !isEndOfLine(lexer->index[0])) {
@@ -77,6 +73,7 @@ struct Token lexerNextToken(struct Lexer* lexer) {
 
     char ch = lexer->index[0];
     lexer->index++;
+    lexer->count++;
     switch (ch) {
         case '=':
             token.type = T_ASSIGN;
@@ -108,6 +105,11 @@ struct Token lexerNextToken(struct Lexer* lexer) {
         
         case ')':
             token.type = T_RIGHTPAREN;
+            break;
+
+        case '\r':
+        case '\n':
+            token.type = T_NEWLINE;
             break;
 
         case '"': {
@@ -169,6 +171,10 @@ int lexerTokenEquals(struct Token token, char* toMatch) {
         }
     }
     return (*index == 0);
+}
+
+bool lexerExpectToken(struct Token token, int type) {
+    return token.type == type;
 }
 
 void lexerPrintToken(struct Token token) {

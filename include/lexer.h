@@ -16,6 +16,7 @@ enum TokenTypes {
 
     T_ASSIGN,
     T_SEMICOLON,
+    T_NEWLINE,
     T_LEFTPAREN,    // '('
     T_RIGHTPAREN,   // ')'
 
@@ -43,8 +44,8 @@ struct Lexer {
     struct Interpreter* vm;
     char* index;
     int line;
+    int count;
     struct Token token;
-    int depth;  // parentheses 'depth', must be 0 when statement/expression ends
 };
 
 struct Token lexerNextToken(struct Lexer* lexer);
@@ -52,6 +53,8 @@ struct Token lexerNextToken(struct Lexer* lexer);
 void lexerGetTokenValue(char* buffer, struct Token token);
 
 int lexerTokenEquals(struct Lexer* lexer, char* toMatch);
+
+bool lexerExpectToken(struct Token token, int type);
 
 void lexerPrintToken(struct Token token);
 

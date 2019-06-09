@@ -36,16 +36,12 @@ void parseStatement(struct Lexer* lexer) {
 	struct Token token = lexerNextToken(lexer);
 
 	switch (token.type) {
-		case T_SEMICOLON: {
+        case T_NEWLINE:
+            break;
 
-		}
-			break;
-
-		case T_EOF:
-		case T_UNKNOWN: {
-
-		}
-			break;
+        case T_SEMICOLON:
+            lexerNextToken(lexer);
+            break;
 
 		default: {
 			parseExpression(lexer, 0);
@@ -79,6 +75,11 @@ void parseSimpleExpression(struct Lexer* lexer) {
             lexerNextToken(lexer);
             if (!tupleEnd(lexer)) {
                 parseExpression(lexer, 0);
+            }
+            if (lexerExpectToken(lexer->token, T_RIGHTPAREN)) {
+                lexerNextToken(lexer);   // Skip ')'
+            } else {
+                printf("%s\n", "Missing closing ')' parenthesis");
             }
         }
             break;

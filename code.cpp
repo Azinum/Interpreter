@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 int storeNumber(struct Interpreter* vm, double number) {
-    int pointer = vm->storage.size();
+    int location = vm->storage.size();
     
     struct Object object = (struct Object) {
         T_NUMBER,
@@ -19,7 +19,7 @@ int storeNumber(struct Interpreter* vm, double number) {
     };
 
     vm->storage.push_back(object);
-    return pointer;
+    return location;
 }
 
 // TODO: Support any type
@@ -50,12 +50,11 @@ int codePushVariable(struct Interpreter* vm, struct Token token) {
     char buffer[128] = {0};
     lexerGetTokenValue(buffer, token);
 
-    struct Object object = {};
     int location;
     if (variableExists(vm, buffer)) {
         location = getVariableLocation(vm, buffer);
     } else {
-        location = storeVariable(vm, buffer, object);
+        location = storeVariable2(vm, buffer);
     }
     
     vm->code.push_back(OP_PUSH_VAR);
