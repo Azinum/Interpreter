@@ -55,21 +55,22 @@ void statements(struct Lexer* lexer) {
     while (!statementsEnd(lexer)) {
         statement(lexer);
     }
-    printf("statements ended with");
-    lexerPrintToken(lexer->token);
 }
 
 void statement(struct Lexer* lexer) {
 	struct Token token = lexer->token;
 
 	switch (token.type) {
+        case T_EOF:
+            break;
+        case T_NEWLINE:
+            lexerNextToken(lexer);
+            break;
         case T_SEMICOLON:
             lexerNextToken(lexer);
             break;
         case T_IF:
             ifStatement(lexer);
-            break;
-        case T_EOF:
             break;
 		default:
 			expression(lexer, 0);

@@ -16,5 +16,5 @@ OP_MULT,
 
 // Produces an error. FIX!
 if (1) {
-
+    a = 5
 }

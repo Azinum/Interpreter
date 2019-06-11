@@ -41,6 +41,7 @@ void printTop(struct Interpreter* vm, int offset);
 void exitInterpreter(int i);
 
 inline void stackPop(struct Interpreter* vm);
+inline void stackSet(struct Interpreter* vm, int value);
 inline void clearStack(struct Interpreter* vm);
 inline bool isTrue(struct Object object);
 inline struct Object getTop(struct Interpreter* vm);
@@ -48,6 +49,12 @@ inline struct Object getTop(struct Interpreter* vm);
 void stackPop(struct Interpreter* vm) {
     if (vm->stackPointer > 0) {
         vm->stackPointer--;
+    }
+}
+
+void stackSet(struct Interpreter* vm, int value) {
+    if (value < vm->stackPointer && value >= 0) {
+        vm->stackPointer = value;
     }
 }
 
@@ -212,7 +219,7 @@ int interpreterExecute(struct Interpreter* vm) {
     });
     EXIT: {
         printTop(vm, 1);
-        stackPop(vm);
+        stackSet(vm, 0);    // Reset stack to 0
         vm->program.pop_back(); // Remove EXIT instruction
         return vm->status;
     }
