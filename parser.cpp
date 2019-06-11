@@ -48,13 +48,15 @@ bool blockEnd(struct Lexer* lexer) {
 
 bool statementsEnd(struct Lexer* lexer) {
     int type = lexer->token.type;
-    return (type == T_EOF || type == T_BLOCKEND);
+    return (type == T_BLOCKEND || type == T_EOF);
 }
 
 void statements(struct Lexer* lexer) {
     while (!statementsEnd(lexer)) {
         statement(lexer);
     }
+    printf("statements ended with");
+    lexerPrintToken(lexer->token);
 }
 
 void statement(struct Lexer* lexer) {
@@ -64,14 +66,14 @@ void statement(struct Lexer* lexer) {
         case T_SEMICOLON:
             lexerNextToken(lexer);
             break;
-        case T_IF: {
+        case T_IF:
             ifStatement(lexer);
             break;
-        }
-		default: {
+        case T_EOF:
+            break;
+		default:
 			expression(lexer, 0);
             break;
-		}
 	}
 }
 
@@ -84,7 +86,8 @@ void simpleExpression(struct Lexer* lexer) {
             lexerNextToken(lexer);  // Skip identifier
             if (lexer->token.type == T_ASSIGN) {
                 lexerNextToken(lexer);  // Skip '='
-                expression(lexer, 0);
+                // expression(lexer, 0);
+                statement(lexer);
                 codeAssign(lexer->vm, location);
                 if (lexerTokenIs(lexer, T_SEMICOLON)) {
                     codePop(lexer->vm);
@@ -100,7 +103,8 @@ void simpleExpression(struct Lexer* lexer) {
         case T_LEFTPAREN: {
             lexerNextToken(lexer);  // Skip '('
             if (!tupleEnd(lexer)) {
-                expression(lexer, 0);
+                // expression(lexer, 0);
+                statement(lexer);
             }
             if (lexerExpectToken(lexer->token, T_RIGHTPAREN)) {
                 lexerNextToken(lexer);   // Skip ')'
@@ -114,7 +118,7 @@ void simpleExpression(struct Lexer* lexer) {
             break;
         }
 
-        default:    // Skip unused token
+        default:
             lexerNextToken(lexer);
             break;
     }

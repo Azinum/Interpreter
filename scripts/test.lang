@@ -14,6 +14,7 @@ OP_MULT,
 
 */
 
+// Produces an error. FIX!
 if (1) {
-    2
+
 }
