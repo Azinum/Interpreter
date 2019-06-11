@@ -96,8 +96,9 @@ void simpleExpression(struct Lexer* lexer) {
             }
             break;
         }
+        case T_STRING:
         case T_NUMBER: {
-            codePushNumber(lexer->vm, token);
+            codePushObject(lexer->vm, token);
             lexerNextToken(lexer);
             break;
         }
@@ -119,9 +120,10 @@ void simpleExpression(struct Lexer* lexer) {
             break;
         }
 
-        default:
+        default: {
             lexerNextToken(lexer);
             break;
+        }
     }
 }
 

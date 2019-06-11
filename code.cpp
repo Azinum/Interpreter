@@ -22,23 +22,50 @@ int storeNumber(struct Interpreter* vm, double number) {
     return location;
 }
 
-// TODO: Support any type
-void codePushNumber(struct Interpreter* vm, struct Token token) {
+int storeObject(struct Interpreter* vm, struct Object object) {
+    int location = vm->storage.size();
+    vm->storage.push_back(object);
+    return location;
+}
+
+void codePushObject(struct Interpreter* vm, struct Token token) {
     if (!vm) return;
+    int object = -1;
 
-    char buffer[128] = {0};
-    lexerGetTokenValue(buffer, token);
-    if (!isNumber(buffer)) {
-        printf("%s\n", "Invalid number");
-        return;
+    switch (token.type) {
+        case T_NUMBER: {
+            char buffer[128] = {0};
+            lexerGetTokenValue(buffer, token);
+            if (!isNumber(buffer)) {
+                printf("%s\n", "Invalid number");
+                return;
+            }
+
+            double number = stringToNumber(buffer);
+            object = storeNumber(vm, number);
+            if (object < 0) {
+                printf("%s\n", "Failed to store number");
+                return;
+            }
+            break;
+        }
+
+        case T_STRING: {
+            struct String string = (struct String) {
+                .index = token.string,
+                .length = token.length
+            };
+            struct Object stringObject = (struct Object) {
+                .type = T_STRING,
+                .value = {
+                    .string = string
+                }
+            };
+            object = storeObject(vm, stringObject);
+            break;
+        }
     }
 
-    double number = stringToNumber(buffer);
-    int object = storeNumber(vm, number);
-    if (object < 0) {
-        printf("%s\n", "Failed to store number");
-        return;
-    }
     vm->code.push_back(OP_PUSH);
     vm->code.push_back(object);
 

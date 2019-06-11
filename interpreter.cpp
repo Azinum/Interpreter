@@ -30,6 +30,8 @@ if (vm->stackPointer > 1) { \
     if (OP_SAMETYPE(left, right, T_NUMBER)) { \
         vm->stack[vm->stackPointer - 2].value.number = left.value.number OP right.value.number; \
         vm->stackPointer--; \
+    } else { \
+        error(vm, "Can't do arithmetic operation, invalid types"); \
     } \
 } \
 
@@ -40,11 +42,17 @@ static struct Interpreter* _interpreter;
 void printTop(struct Interpreter* vm, int offset);
 void exitInterpreter(int i);
 
+inline void error(struct Interpreter* vm, const char* message);
 inline void stackPop(struct Interpreter* vm);
 inline void stackSet(struct Interpreter* vm, int value);
 inline void clearStack(struct Interpreter* vm);
 inline bool isTrue(struct Object object);
 inline struct Object getTop(struct Interpreter* vm);
+
+
+void error(struct Interpreter* vm, const char* message) {
+    printf("[RuntimeError] %s\n", message);
+}
 
 void stackPop(struct Interpreter* vm) {
     if (vm->stackPointer > 0) {
@@ -68,6 +76,11 @@ bool isTrue(struct Object object) {
             if (object.value.number > 0)
                 return true;
             break;
+
+        case T_STRING:
+            if (object.value.string.length != 0)
+                return true;
+            break;
         
         default:
             break;
@@ -88,9 +101,18 @@ struct Object getTop(struct Interpreter* vm) {
 void printTop(struct Interpreter* vm, int offset) {
     int index = vm->stackPointer - offset;
     if (index >= 0 && index < STACK_SIZE) {
-        struct Object object = vm->stack[vm->stackPointer - offset];
-        if (object.type == T_NUMBER)
-            printf("%g\n", object.value.number);
+        struct Object object = vm->stack[index];
+        switch (object.type) {
+            case T_NUMBER: {
+                printf("%g\n", object.value.number);
+                break;
+            }
+            case T_STRING: {
+                struct String string = object.value.string;
+                printf("'%.*s'\n", string.length, string.index);
+                break;
+            }
+        }
     }
 }
 
@@ -203,8 +225,9 @@ int interpreterExecute(struct Interpreter* vm) {
         struct Object toAssign;
         location = vm->code[vm->ip + 1];
         toAssign = vm->stack[vm->stackPointer - 1];
-        if (toAssign.type == T_NUMBER) {
+        if (toAssign.type != T_UNKNOWN) {
             vm->current->variables[location] = toAssign;
+            stackPop(vm);
         }
         vm->ip++;
     });

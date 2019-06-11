@@ -7,7 +7,9 @@ struct Interpreter;
 
 int storeNumber(struct Interpreter* vm, double number);
 
-void codePushNumber(struct Interpreter* vm, struct Token token);
+int storeObject(struct Interpreter* vm, struct Object object);
+
+void codePushObject(struct Interpreter* vm, struct Token token);
 
 int codePushVariable(struct Interpreter* vm, struct Token token);
 

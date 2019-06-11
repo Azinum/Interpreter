@@ -7,14 +7,20 @@
 #include <map>
 #include <string>
 
+struct String {
+    char* index;
+    int length;
+};
+
 union ObjValue {
     double number;
     void* pointer;
+    struct String string;
     struct Object* object;
 };
 
 struct Object {
-    unsigned int type;
+    unsigned char type;
     union ObjValue value;
 };
 

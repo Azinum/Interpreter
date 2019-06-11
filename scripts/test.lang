@@ -1,20 +1,7 @@
-/*
+// test.lang
 
-2 * 3 * 4 * 5
-
-Generated code should be like this:
-
-OP_PUSH, 0,
-OP_PUSH, 1,
-OP_MULT,
-OP_PUSH, 2,
-OP_MULT,
-OP_PUSH, 3,
-OP_MULT,
-
-*/
-
-// Produces an error. FIX!
-if (1) {
-    a = 5
+a = if (1) {
+    "Hello World"
 }
+
+a
