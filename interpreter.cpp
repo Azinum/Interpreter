@@ -15,6 +15,7 @@
 
 #define VM_NEXT goto *(vm->program[++vm->ip])
 #define VM_SKIP(COUNT) (vm->ip += COUNT)
+#define VM_GOTO(LOCATION) (vm->ip = LOCATION); VM_NEXT
 
 #define VM_CASE(CASE, BODY, ...) { \
     CASE : { BODY } \
@@ -41,15 +42,39 @@ void exitInterpreter(int i);
 
 inline void stackPop(struct Interpreter* vm);
 inline void clearStack(struct Interpreter* vm);
+inline bool isTrue(struct Object object);
+inline struct Object getTop(struct Interpreter* vm);
 
-inline void stackPop(struct Interpreter* vm) {
+void stackPop(struct Interpreter* vm) {
     if (vm->stackPointer > 0) {
         vm->stackPointer--;
     }
 }
 
-inline void clearStack(struct Interpreter* vm) {
+void clearStack(struct Interpreter* vm) {
     vm->stackPointer = 0;
+}
+
+bool isTrue(struct Object object) {
+    switch (object.type) {
+        case T_NUMBER:
+            if (object.value.number > 0)
+                return true;
+            break;
+        
+        default:
+            break;
+    }
+    return false;
+}
+
+struct Object getTop(struct Interpreter* vm) {
+    struct Object object = {};
+    if (vm->stackPointer > 0) {
+        object = vm->stack[vm->stackPointer - 1];
+        stackPop(vm);
+    }
+    return object;
 }
 
 // printTop(1) is top of stack
@@ -86,6 +111,7 @@ int interpreterExecute(struct Interpreter* vm) {
         &&PUSH,
         &&PUSH_VAR,
         &&ASSIGN,
+        &&IF,
 
         &&EXIT
     };
@@ -97,6 +123,7 @@ int interpreterExecute(struct Interpreter* vm) {
 
         switch (instruction) {
             // 1 arg, skip 1 instruction
+            case OP_IF:
             case OP_ASSIGN:
             case OP_PUSH_VAR:
             case OP_PUSH:
@@ -143,6 +170,9 @@ int interpreterExecute(struct Interpreter* vm) {
     VM_CASE(NEQ, {
         OP_ARITH(!=);
     });
+    VM_CASE(POP, {
+        stackPop(vm);
+    });
     VM_CASE(PUSH, {
         int pointer = vm->code[vm->ip + 1];
         struct Object obj;
@@ -171,8 +201,14 @@ int interpreterExecute(struct Interpreter* vm) {
         }
         vm->ip++;
     });
-    VM_CASE(POP, {
-        stackPop(vm);
+    VM_CASE(IF, {
+        int location = vm->code[vm->ip + 1];
+        struct Object top = getTop(vm); // Read condition value
+        if (isTrue(top)) {
+            vm->ip++;
+        } else {
+            VM_GOTO(location);
+        }
     });
     EXIT: {
         printTop(vm, 1);

@@ -25,6 +25,9 @@ enum TokenTypes {
     T_NEWLINE,
     T_LEFTPAREN,    // '('
     T_RIGHTPAREN,   // ')'
+    T_BLOCKBEGIN,   // '{'
+    T_BLOCKEND,     // '}'
+    T_IF,
 
     T_STRING,
     T_IDENTIFIER,
@@ -58,7 +61,7 @@ struct Token lexerNextToken(struct Lexer* lexer);
 
 void lexerGetTokenValue(char* buffer, struct Token token);
 
-int lexerTokenEquals(struct Lexer* lexer, char* toMatch);
+int lexerTokenEquals(struct Token token, const char* toMatch);
 
 bool lexerExpectToken(struct Token token, int type);
 

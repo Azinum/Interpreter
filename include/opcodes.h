@@ -21,6 +21,7 @@ enum OpCodes {
     OP_PUSH,
     OP_PUSH_VAR,
     OP_ASSIGN,
+    OP_IF,
 
 
     OP_EXIT,
@@ -45,7 +46,8 @@ static const char* opCodesStrings[] = {
     "OP_POP",
     "OP_PUSH",
     "OP_PUSH_VAR",
-    "OP_ASSIGN"
+    "OP_ASSIGN",
+    "OP_IF",
 };
 
 int toOpCode(int tokenType);

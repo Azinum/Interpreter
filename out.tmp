@@ -1,8 +1,6 @@
 OP_PUSH, 0,
+OP_IF, jmp:?
 OP_PUSH, 1,
-OP_NEQ,
 OP_PUSH, 2,
-OP_PUSH, 3,
-OP_NEQ,
 [stack size: 0]
-[program size: 10]
+[program size: 8]

@@ -65,7 +65,7 @@ int codePushVariable(struct Interpreter* vm, struct Token token) {
 
 void codeAssign(struct Interpreter* vm, int location) {
     if (!vm) return;
-    
+
     vm->code.push_back(OP_ASSIGN);
     vm->code.push_back(location);
     writeOut(vm->out, "%s, %i\n", opCodeToString(OP_ASSIGN), location);
@@ -77,6 +77,20 @@ void codePop(struct Interpreter* vm) {
 
     vm->code.push_back(OP_POP);
     writeOut(vm->out, "%s\n", opCodeToString(OP_POP));
+}
+
+void codeIfBegin(struct Interpreter* vm, int* writeIndex) {
+    if (!vm) return;
+
+    vm->code.push_back(OP_IF);
+    *writeIndex = vm->code.size();
+    vm->code.push_back(-1);
+    writeOut(vm->out, "%s, jmp:?\n", opCodeToString(OP_IF));
+}
+
+void codeWriteAt(struct Interpreter* vm, int what, int index) {
+    if (!vm) return;
+    if (index < vm->code.size()) vm->code[index] = what;
 }
 
 // Generate code for any arithmetic operator

@@ -138,6 +138,14 @@ struct Token lexerNextToken(struct Lexer* lexer) {
             token.type = T_RIGHTPAREN;
             break;
 
+        case '{':
+            token.type = T_BLOCKBEGIN;
+            break;
+        
+        case '}':
+            token.type = T_BLOCKEND;
+            break;
+
         case '\r':
         case '\n':
             token.type = T_NEWLINE;
@@ -162,6 +170,10 @@ struct Token lexerNextToken(struct Lexer* lexer) {
             break;
         }
 
+        case '\0':
+            token.type = T_EOF;
+            break;
+
         default: {
             if (isAlphabetical(ch) || ch == '_') {
                 while (
@@ -173,6 +185,10 @@ struct Token lexerNextToken(struct Lexer* lexer) {
                 }
                 token.type = T_IDENTIFIER;
                 token.length = lexer->index - token.string;
+                
+                if (lexerTokenEquals(token, "if")) {
+                    token.type = T_IF;
+                }
             }
             else if (isNumber(ch)) {
                 while (isNumber(lexer->index[0]) || lexer->index[0] == '.') {
@@ -182,7 +198,7 @@ struct Token lexerNextToken(struct Lexer* lexer) {
                 token.length = lexer->index - token.string;
             }
             else {
-                token.type = T_UNKNOWN;
+                token.type = T_EOF;
             }
         }
             break;
@@ -195,8 +211,8 @@ void lexerGetTokenValue(char* buffer, struct Token token) {
     sprintf(buffer, "%.*s", token.length, token.string);
 }
 
-int lexerTokenEquals(struct Token token, char* toMatch) {
-    char* index = toMatch;
+int lexerTokenEquals(struct Token token, const char* toMatch) {
+    const char* index = toMatch;
     for (int i = 0; i < token.length; i++, index++) {
         if ((*index == '\0') || token.string[i] != *index) {
             return 0;

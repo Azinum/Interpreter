@@ -10,11 +10,14 @@
 
 void error(struct Lexer* lexer, const char* message, struct Token token);
 struct Operator getOperator(struct Token token);
-bool tupleEnd(struct Lexer* lexer);
+inline bool tupleEnd(struct Lexer* lexer);
+inline bool blockEnd(struct Lexer* lexer);
 
-void parseStatement(struct Lexer* lexer);
-void parseSimpleExpression(struct Lexer* lexer);
-struct Operator parseExpression(struct Lexer* lexer, int priority);
+void statements(struct Lexer* lexer);
+void statement(struct Lexer* lexer);
+void simpleExpression(struct Lexer* lexer);
+struct Operator expression(struct Lexer* lexer, int priority);
+void ifStatement(struct Lexer* lexer);
 
 void error(struct Lexer* lexer, const char* message, struct Token token) {
     char buffer[128] = {0};
@@ -39,21 +42,40 @@ bool tupleEnd(struct Lexer* lexer) {
     return (type == T_RIGHTPAREN);
 }
 
-void parseStatement(struct Lexer* lexer) {
+bool blockEnd(struct Lexer* lexer) {
+    return (lexer->token.type == T_BLOCKEND);
+}
+
+bool statementsEnd(struct Lexer* lexer) {
+    int type = lexer->token.type;
+    return (type == T_EOF || type == T_BLOCKEND);
+}
+
+void statements(struct Lexer* lexer) {
+    while (!statementsEnd(lexer)) {
+        statement(lexer);
+    }
+}
+
+void statement(struct Lexer* lexer) {
 	struct Token token = lexer->token;
 
 	switch (token.type) {
         case T_SEMICOLON:
             lexerNextToken(lexer);
             break;
+        case T_IF: {
+            ifStatement(lexer);
+            break;
+        }
 		default: {
-			parseExpression(lexer, 0);
+			expression(lexer, 0);
             break;
 		}
 	}
 }
 
-void parseSimpleExpression(struct Lexer* lexer) {
+void simpleExpression(struct Lexer* lexer) {
     struct Token token = lexer->token;
 
     switch (token.type) {
@@ -62,7 +84,7 @@ void parseSimpleExpression(struct Lexer* lexer) {
             lexerNextToken(lexer);  // Skip identifier
             if (lexer->token.type == T_ASSIGN) {
                 lexerNextToken(lexer);  // Skip '='
-                parseExpression(lexer, 0);
+                expression(lexer, 0);
                 codeAssign(lexer->vm, location);
                 if (lexerTokenIs(lexer, T_SEMICOLON)) {
                     codePop(lexer->vm);
@@ -78,7 +100,7 @@ void parseSimpleExpression(struct Lexer* lexer) {
         case T_LEFTPAREN: {
             lexerNextToken(lexer);  // Skip '('
             if (!tupleEnd(lexer)) {
-                parseExpression(lexer, 0);
+                expression(lexer, 0);
             }
             if (lexerExpectToken(lexer->token, T_RIGHTPAREN)) {
                 lexerNextToken(lexer);   // Skip ')'
@@ -92,16 +114,16 @@ void parseSimpleExpression(struct Lexer* lexer) {
             break;
         }
 
-        default:
+        default:    // Skip unused token
+            lexerNextToken(lexer);
             break;
     }
 }
 
 // (expr) op (expr)
-struct Operator parseExpression(struct Lexer* lexer, int priority) {
+struct Operator expression(struct Lexer* lexer, int priority) {
 	// TODO: Add unary operators
-
-    parseSimpleExpression(lexer);
+    simpleExpression(lexer);
 
     struct Operator op = getOperator(lexer->token);
     struct Token token = lexer->token;
@@ -110,11 +132,36 @@ struct Operator parseExpression(struct Lexer* lexer, int priority) {
         struct Operator nextOp;
         token = lexer->token;
         lexerNextToken(lexer);
-        nextOp = parseExpression(lexer, op.right);
+        nextOp = expression(lexer, op.right);
         codeOperator(lexer->vm, token);
         op = nextOp;
     }
     return op;
+}
+
+void ifStatement(struct Lexer* lexer) {
+    int writeIndex = -1;  // What index to write the jump location to
+    lexerNextToken(lexer);  // Skip 'if'
+    if (!lexerExpectToken(lexer->token, T_LEFTPAREN)) {
+        error(lexer, "Missing condition", lexer->token);
+        return;
+    }
+    expression(lexer, 0);   // read condition
+    codeIfBegin(lexer->vm, &writeIndex);
+    if (!lexerExpectToken(lexer->token, T_BLOCKBEGIN)) {
+        error(lexer, "Missing block", lexer->token);
+        return;
+    }
+    lexerNextToken(lexer);  // Skip '{'
+    statements(lexer);
+    if (!lexerExpectToken(lexer->token, T_BLOCKEND)) {
+        error(lexer, "Missing block end '}'", lexer->token);
+    }
+    lexerNextToken(lexer);  // Skip '}'
+    if (writeIndex >= 0) {
+        int jumpTo = lexer->vm->code.size()-1;
+        codeWriteAt(lexer->vm, jumpTo, writeIndex);
+    }
 }
 
 int parse(struct Interpreter* vm, char* input) {
@@ -122,7 +169,7 @@ int parse(struct Interpreter* vm, char* input) {
     lexer.vm = vm;
 	lexer.line = 1;
 	lexer.index = input;
-    lexerNextToken(&lexer);
-    parseStatement(&lexer);
+    lexerNextToken(&lexer); // Read first token
+    statements(&lexer);
 	return 0;
 }
