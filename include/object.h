@@ -7,6 +7,12 @@
 #include <map>
 #include <string>
 
+extern "C" {
+
+typedef int (*CFunction)(...);
+
+}
+
 struct String {
     char* index;
     int length;
@@ -15,6 +21,7 @@ struct String {
 union ObjValue {
     double number;
     void* pointer;
+    CFunction cfunc;
     struct String string;
     struct Object* object;
 };

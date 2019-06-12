@@ -1,7 +1,10 @@
 // test.lang
 
-a = if (1) {
-    "Hello World"
+a = "Hello"
+
+b = if (1) {
+    8
 }
 
 a
+b

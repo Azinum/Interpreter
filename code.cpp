@@ -52,7 +52,7 @@ void codePushObject(struct Interpreter* vm, struct Token token) {
 
         case T_STRING: {
             struct String string = (struct String) {
-                .index = token.string,
+                .index = &token.string[0],
                 .length = token.length
             };
             struct Object stringObject = (struct Object) {
@@ -69,7 +69,7 @@ void codePushObject(struct Interpreter* vm, struct Token token) {
     vm->code.push_back(OP_PUSH);
     vm->code.push_back(object);
 
-    writeOut(vm->out, "%s, %i,\n", opCodeToString(OP_PUSH), object);
+    // writeOut(vm->out, "%s, %i,\n", opCodeToString(OP_PUSH), object);
 }
 
 int codePushVariable(struct Interpreter* vm, struct Token token) {
@@ -86,7 +86,7 @@ int codePushVariable(struct Interpreter* vm, struct Token token) {
     
     vm->code.push_back(OP_PUSH_VAR);
     vm->code.push_back(location);
-    writeOut(vm->out, "%s, %i,\n", opCodeToString(OP_PUSH_VAR), location);
+    // writeOut(vm->out, "%s, %i,\n", opCodeToString(OP_PUSH_VAR), location);
     return location;
 }
 
@@ -95,7 +95,7 @@ void codeAssign(struct Interpreter* vm, int location) {
 
     vm->code.push_back(OP_ASSIGN);
     vm->code.push_back(location);
-    writeOut(vm->out, "%s, %i\n", opCodeToString(OP_ASSIGN), location);
+    // writeOut(vm->out, "%s, %i\n", opCodeToString(OP_ASSIGN), location);
 }
 
 // Add OP_POP instruction
@@ -103,7 +103,7 @@ void codePop(struct Interpreter* vm) {
     if (!vm) return;
 
     vm->code.push_back(OP_POP);
-    writeOut(vm->out, "%s\n", opCodeToString(OP_POP));
+    // writeOut(vm->out, "%s\n", opCodeToString(OP_POP));
 }
 
 void codeIfBegin(struct Interpreter* vm, int* writeIndex) {
@@ -112,7 +112,7 @@ void codeIfBegin(struct Interpreter* vm, int* writeIndex) {
     vm->code.push_back(OP_IF);
     *writeIndex = vm->code.size();
     vm->code.push_back(-1);
-    writeOut(vm->out, "%s, jmp:?\n", opCodeToString(OP_IF));
+    // writeOut(vm->out, "%s, jmp:?\n", opCodeToString(OP_IF));
 }
 
 void codeWriteAt(struct Interpreter* vm, int what, int index) {
@@ -128,5 +128,5 @@ void codeOperator(struct Interpreter* vm, struct Token token) {
         return;
     }
     vm->code.push_back(opCode);
-    writeOut(vm->out, "%s,\n", opCodeToString(opCode));
+    // writeOut(vm->out, "%s,\n", opCodeToString(opCode));
 }

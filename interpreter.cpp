@@ -41,6 +41,7 @@ static struct Interpreter* _interpreter;
 
 void printTop(struct Interpreter* vm, int offset);
 void exitInterpreter(int i);
+void printStack(struct Interpreter* vm);
 
 inline void error(struct Interpreter* vm, const char* message);
 inline void stackPop(struct Interpreter* vm);
@@ -48,7 +49,7 @@ inline void stackSet(struct Interpreter* vm, int value);
 inline void clearStack(struct Interpreter* vm);
 inline bool isTrue(struct Object object);
 inline struct Object getTop(struct Interpreter* vm);
-
+inline struct Object number(double value);
 
 void error(struct Interpreter* vm, const char* message) {
     printf("[RuntimeError] %s\n", message);
@@ -97,6 +98,14 @@ struct Object getTop(struct Interpreter* vm) {
     return object;
 }
 
+struct Object number(double value) {
+    struct Object object = (struct Object) {
+        .type = T_NUMBER,
+        .value = { .number = value }
+    };
+    return object;
+}
+
 // printTop(1) is top of stack
 void printTop(struct Interpreter* vm, int offset) {
     int index = vm->stackPointer - offset;
@@ -109,10 +118,17 @@ void printTop(struct Interpreter* vm, int offset) {
             }
             case T_STRING: {
                 struct String string = object.value.string;
-                printf("'%.*s'\n", string.length, string.index);
+                printf("%.*s\n", string.length, string.index);
                 break;
             }
         }
+    }
+}
+
+// Print stack from bottom to top
+void printStack(struct Interpreter* vm) {
+    for (int i = vm->stackPointer; i > 0 ; i--) {
+        printTop(vm, i);
     }
 }
 
@@ -152,15 +168,23 @@ int interpreterExecute(struct Interpreter* vm) {
 
         switch (instruction) {
             // 1 arg, skip 1 instruction
-            case OP_IF:
-            case OP_ASSIGN:
-            case OP_PUSH_VAR:
-            case OP_PUSH:
+            case OP_IF: {
                 vm->program.push_back(instructions[instruction]);
+                writeOut(vm->out, "%s, jmp:%i\n", opCodeToString(instruction), vm->code[vm->codeip + 1]);
                 vm->codeip++;
                 break;
+            }
+            case OP_ASSIGN:
+            case OP_PUSH_VAR:
+            case OP_PUSH: {
+                vm->program.push_back(instructions[instruction]);
+                writeOut(vm->out, "%s, %i\n", opCodeToString(instruction), vm->code[vm->codeip + 1]);
+                vm->codeip++;
+                break;
+            }
 
             default:
+                writeOut(vm->out, "%s\n", opCodeToString(instruction));
                 break;
         }
     }
@@ -235,13 +259,14 @@ int interpreterExecute(struct Interpreter* vm) {
         int location = vm->code[vm->ip + 1];
         struct Object top = getTop(vm); // Read condition value
         if (isTrue(top)) {
+            stackPop(vm);
             vm->ip++;
         } else {
             VM_GOTO(location);
         }
     });
     EXIT: {
-        printTop(vm, 1);
+        printStack(vm);
         stackSet(vm, 0);    // Reset stack to 0
         vm->program.pop_back(); // Remove EXIT instruction
         return vm->status;
@@ -289,10 +314,7 @@ int interpreter(int argc, char** argv) {
     interpreter.current = &interpreter.global;
     signal(SIGINT, exitInterpreter);
 
-    storeVariable(&interpreter, "pi", (struct Object) {
-        .type = T_NUMBER,
-        .value = { .number = M_PI }
-    });
+    storeVariable(&interpreter, "pi", number(M_PI));
 
     if (argc >= 2) {    // Execute file
         char* read = readFile(argv[1]);

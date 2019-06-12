@@ -163,6 +163,7 @@ void ifStatement(struct Lexer* lexer) {
     statements(lexer);
     if (!lexerExpectToken(lexer->token, T_BLOCKEND)) {
         error(lexer, "Missing block end '}'", lexer->token);
+        return;
     }
     lexerNextToken(lexer);  // Skip '}'
     if (writeIndex >= 0) {
