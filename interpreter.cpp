@@ -262,10 +262,12 @@ int interpreterExecute(struct Interpreter* vm) {
             stackPop(vm);
             vm->ip++;
         } else {
+            stackPop(vm);
             VM_GOTO(location);
         }
     });
     EXIT: {
+        printf("[stack size: %i]\n", vm->stackPointer);
         printStack(vm);
         stackSet(vm, 0);    // Reset stack to 0
         vm->program.pop_back(); // Remove EXIT instruction
@@ -336,7 +338,6 @@ int interpreter(int argc, char** argv) {
             }
         }
     }
-    writeOut(interpreter.out, "[stack size: %i]\n", interpreter.stackPointer);
     writeOut(interpreter.out, "[program size: %i]\n", interpreter.program.size());
     if (interpreter.out) fclose(interpreter.out);
     return status;

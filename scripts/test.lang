@@ -1,10 +1,10 @@
 // test.lang
 
-a = "Hello"
-
-b = if (1) {
-    8
+if (1) {
+    a = 5;
+    b = 7;
+    c = 12;
+    d = a + b * c;
 }
 
-a
-b
+a b c d
