@@ -1,4 +1,6 @@
 OP_PUSH, 0
+OP_IF, jmp:5
 OP_PUSH, 1
-OP_ADD
-[program size: 5]
+OP_PUSH_VAR, 1
+OP_PUSH_VAR, 0
+[program size: 10]

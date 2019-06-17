@@ -44,7 +44,9 @@ void exitInterpreter(int i);
 void printStack(struct Interpreter* vm);
 
 inline void error(struct Interpreter* vm, const char* message);
+inline void stackPush(struct Interpreter* vm, struct Object object);
 inline void stackPop(struct Interpreter* vm);
+inline void stackPop2(struct Interpreter* vm, int count);
 inline void stackSet(struct Interpreter* vm, int value);
 inline void clearStack(struct Interpreter* vm);
 inline bool isTrue(struct Object object);
@@ -55,10 +57,20 @@ void error(struct Interpreter* vm, const char* message) {
   printf("[RuntimeError] %s\n", message);
 }
 
+
+void stackPush(struct Interpreter* vm, struct Object object) {
+  vm->stack[vm->stackPointer++] = object;
+}
+
 void stackPop(struct Interpreter* vm) {
   if (vm->stackPointer > 0) {
     vm->stackPointer--;
   }
+}
+
+void stackPop2(struct Interpreter* vm, int count) {
+  if ((vm->stackPointer -= count) < 0)
+    vm->stackPointer = 0;
 }
 
 void stackSet(struct Interpreter* vm, int value) {
@@ -249,10 +261,10 @@ int interpreterExecute(struct Interpreter* vm) {
     struct Object toAssign;
     location = vm->code[vm->ip + 1];
     toAssign = vm->stack[vm->stackPointer - 1];
-    if (toAssign.type != T_UNKNOWN) {
-      vm->current->variables[location] = toAssign;
-      stackPop(vm);
-    }
+    struct Object* obj = &vm->current->variables[location];
+    *obj = toAssign;
+    stackPop2(vm, 2);
+    stackPush(vm, *obj);
     vm->ip++;
   });
   VM_CASE(IF, {
@@ -261,13 +273,12 @@ int interpreterExecute(struct Interpreter* vm) {
     if (isTrue(top)) {
       stackPop(vm);
       vm->ip++;
-    } else {
-      stackPop(vm);
-      VM_GOTO(location);
+      VM_NEXT;
     }
+    stackPop(vm);
+    VM_GOTO(location);
   });
   EXIT: {
-    printf("[stack size: %i]\n", vm->stackPointer);
     printStack(vm);
     stackSet(vm, 0);    // Reset stack to 0
     vm->program.pop_back(); // Remove EXIT instruction

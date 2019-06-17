@@ -231,6 +231,6 @@ bool lexerTokenIs(struct Lexer* lexer, int type) {
 
 void lexerPrintToken(struct Token token) {
   if (token.length) {
-  printf("%.*s\n", token.length, token.string);
+    printf("%.*s\n", token.length, token.string);
   }
 }

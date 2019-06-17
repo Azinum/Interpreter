@@ -72,8 +72,8 @@ void statement(struct Lexer* lexer) {
     case T_IF:
       ifStatement(lexer);
       break;
-  default:
-    expression(lexer, 0);
+    default:
+      expression(lexer, 0);
       break;
   }
 }
@@ -87,7 +87,6 @@ void simpleExpression(struct Lexer* lexer) {
       lexerNextToken(lexer);  // Skip identifier
       if (lexer->token.type == T_ASSIGN) {
         lexerNextToken(lexer);  // Skip '='
-        // expression(lexer, 0);
         statement(lexer);
         codeAssign(lexer->vm, location);
         if (lexerTokenIs(lexer, T_SEMICOLON)) {
@@ -105,7 +104,6 @@ void simpleExpression(struct Lexer* lexer) {
     case T_LEFTPAREN: {
       lexerNextToken(lexer);  // Skip '('
       if (!tupleEnd(lexer)) {
-        // expression(lexer, 0);
         statement(lexer);
       }
       if (lexerExpectToken(lexer->token, T_RIGHTPAREN)) {
