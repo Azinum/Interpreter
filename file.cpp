@@ -8,9 +8,9 @@ char* readFile(const char* path) {
    FILE* file = fopen(path, "rb");
 
    if (file == NULL) {
-     printf("Failed to open file '%s\'\n", path);
-     fclose(file);
-     return buffer;
+   printf("Failed to open file '%s\'\n", path);
+   fclose(file);
+   return buffer;
    }
 
    fseek(file, 0, SEEK_END);
@@ -25,8 +25,8 @@ char* readFile(const char* path) {
    buffer[read_size] = '\0';
 
    if (buffer_size != read_size) {
-     free(buffer);
-     buffer = NULL;
+   free(buffer);
+   buffer = NULL;
    }
 
    fclose(file);

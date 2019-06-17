@@ -1,10 +1,10 @@
 // test.lang
 
 if (1) {
-    a = 5;
-    b = 7;
-    c = 12;
-    d = a + b * c;
+  a = 5;
+  b = 7;
+  c = 12;
+  d = a + b * c;
 }
 
 a b c d

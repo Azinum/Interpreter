@@ -1,9 +1,5 @@
 
 
+function event(state, count) {
 
-function test(a) {
-    if (a < 10) {
-        a = 10;
-    }
-    return a;
 }

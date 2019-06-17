@@ -14,27 +14,27 @@ typedef int (*CFunction)(...);
 }
 
 struct String {
-    char* index;
-    int length;
+  char* index;
+  int length;
 };
 
 union ObjValue {
-    double number;
-    void* pointer;
-    CFunction cfunc;
-    struct String string;
-    struct Object* object;
+  double number;
+  void* pointer;
+  CFunction cfunc;
+  struct String string;
+  struct Object* object;
 };
 
 struct Object {
-    unsigned char type;
-    union ObjValue value;
+  unsigned char type;
+  union ObjValue value;
 };
 
 struct Scope {
-    struct Scope* parent;
-    std::map<std::string, int> varLocations;
-    std::vector<struct Object> variables;
+  struct Scope* parent;
+  std::map<std::string, int> varLocations;
+  std::vector<struct Object> variables;
 };
 
 #endif

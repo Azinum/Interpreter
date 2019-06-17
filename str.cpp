@@ -8,24 +8,24 @@
 #include <stdio.h>
 
 bool isNumber(const char* string) {
-    if (strlen(string) <= 0)
-        return false;
-    
-    char* end;
-    strtod(string, &end);
+  if (strlen(string) <= 0)
+    return false;
+  
+  char* end;
+  strtod(string, &end);
 
-    if (*end != '\0')
-        return false;
+  if (*end != '\0')
+    return false;
 
-    return true;
+  return true;
 }
 
 double stringToNumber(const char* string) {    
-    char* end;
-    double number = strtod(string, &end);
-    
-    if (*end != '\0')
-        return INT8_MIN;
-    
-    return number;
+  char* end;
+  double number = strtod(string, &end);
+  
+  if (*end != '\0')
+    return INT8_MIN;
+  
+  return number;
 }
